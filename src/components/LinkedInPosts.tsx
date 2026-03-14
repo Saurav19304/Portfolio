@@ -15,6 +15,12 @@ const LINKEDIN_POSTS = [
     description: "Demonstrated my first marketing automation project using Zapier to automate workflows.",
     link: "https://www.linkedin.com/posts/sauravvaghela19_firstautomation-marketingautomation-zapier-ugcPost-7425322214213722112-4jwP",
   },
+  {
+    id: 3,
+    title: "AI-Assisted Portfolio Development",
+    description: "Built my Digital Marketing & SEO portfolio using AI-assisted development to showcase projects, skills, and creative work.",
+    link: "https://www.linkedin.com/posts/sauravvaghela19_ai-digitalmarketing-seo-activity-7438694155792424960-1fik?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEvbroIBnF2_ny4UJu1FyFevVpj7JUY4f_s",
+  },
 ];
 
 export default function LinkedInPosts() {
