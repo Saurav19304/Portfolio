@@ -5,15 +5,15 @@ import { motion } from "framer-motion";
 const PROJECTS = [
   {
     id: 1,
-    title: "HR Analytics Dashboard",
-    description: "Data analytics dashboard using Power BI to analyze employee performance and visualize workforce insights.",
-    tags: ["Power BI", "Data Analytics", "Data Visualization"],
+    title: "Website Optimization",
+    description: "Performed website optimization by improving on-page SEO elements including meta titles, meta descriptions, heading structure, and internal linking to improve search visibility and website performance.",
+    tags: ["On-Page SEO", "Website Optimization", "Technical SEO", "Content Optimization"],
   },
   {
     id: 2,
-    title: "Netflix Data Analytics",
-    description: "Dashboard analyzing Netflix datasets including genres, release trends, and content distribution to extract insights.",
-    tags: ["Data Analysis", "Dashboarding", "Excel/Power BI"],
+    title: "Keyword Research & Content Strategy",
+    description: "Performed keyword research to identify high-intent search terms and content opportunities. Organized keywords into topic clusters to guide blog and landing page content strategy for improved organic reach.",
+    tags: ["Keyword Research", "SEO Strategy", "Content Planning", "Search Intent Analysis"],
   },
   {
     id: 3,

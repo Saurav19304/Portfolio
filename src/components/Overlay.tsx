@@ -28,12 +28,19 @@ export default function Overlay({ scrollYProgress }: OverlayProps) {
         style={{ opacity: opacity1, y: y1 }}
         className="absolute inset-0 flex flex-col items-center justify-center text-center"
       >
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 text-shadow-sm">
           Saurav Vaghela.
         </h1>
-        <p className="text-xl md:text-2xl text-white/80 font-medium">
+        <p className="text-xl md:text-2xl text-white/80 font-medium mb-8">
           Digital Marketing & SEO Professional.
         </p>
+        <a
+          href="/saurav-cv.pdf"
+          download="Saurav_CV.pdf"
+          className="pointer-events-auto px-8 py-3 bg-white text-black font-semibold rounded-full hover:bg-white/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+        >
+          Download Resume
+        </a>
       </motion.div>
 
       {/* SECTION 2: Left Aligned */}
