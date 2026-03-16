@@ -33,7 +33,7 @@ export default function Contact() {
             <div className="relative flex flex-col sm:flex-row justify-center sm:justify-around items-start sm:items-center p-8 md:p-12 z-10 gap-8 sm:gap-0">
 
               <div className="flex flex-col space-y-10 w-full sm:w-auto">
-                <a href="mailto:sauravvaghela19304@gmail.com" className="flex items-center space-x-6 group/link w-full">
+                <a href="mailto:sauravvaghela22@gmail.com" className="flex items-center space-x-6 group/link w-full">
                   <div className="w-14 h-14 shrink-0 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover/link:bg-white/10 transition-colors">
                     <span className="text-2xl">📧</span>
                   </div>

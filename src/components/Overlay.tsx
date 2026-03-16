@@ -35,7 +35,7 @@ export default function Overlay({ scrollYProgress }: OverlayProps) {
           Digital Marketing & SEO Professional.
         </p>
         <a
-          href="/saurav-cv.pdf"
+          href="/saurav-cv .pdf"
           download="Saurav_CV.pdf"
           className="pointer-events-auto px-8 py-3 bg-white text-black font-semibold rounded-full hover:bg-white/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
         >
