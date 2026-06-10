@@ -1,0 +1,93 @@
+[
+  {
+    "id": "1",
+    "title": "The Power of Schema Markup in Technical SEO",
+    "slug": "power-of-schema-markup",
+    "excerpt": "Learn how structured data markup helps search engines understand your content, driving higher click-through rates (CTR) and unlocking rich search snippets.",
+    "content": "<p>In the competitive world of search engine optimization, getting your pages onto the first page of Google is only half the battle. The other half is enticing searchers to click on your link instead of your competitors'. This is where <strong>Schema Markup</strong> comes in.</p>\n<h2>What is Schema Markup?</h2>\n<p>Schema markup, co-created by Google, Bing, Yahoo, and Yandex, is a semantic vocabulary of tags (structured data) that you add to your HTML. It helps search engines understand not just what your content says, but what it actually <em>means</em>.</p>\n<blockquote>\nStructured data is the language search engines use to translate web content into direct search features.\n</blockquote>\n<h2>Why Schema Matters for SEO</h2>\n<p>While structured data is not a direct ranking factor, it has massive indirect benefits:</p>\n<ul>\n<li><strong>Rich Snippets:</strong> Schema enables search engines to display star ratings, images, prices, FAQs, and event details directly on search results pages.</li>\n<li><strong>Improved CTR:</strong> Rich snippets make your listing visually stand out, leading to significantly higher organic click-through rates.</li>\n<li><strong>Voice Search Readiness:</strong> Structured data helps voice assistants (like Google Assistant or Siri) read your content aloud for search queries.</li>\n</ul>\n<h2>Essential Schema Types to Implement</h2>\n<p>If you're looking to optimize your site, here are the most critical schema types to start with:</p>\n<ol>\n<li><strong>Article Schema:</strong> Ideal for blog posts and news articles. It tells search engines the headline, publisher, author, and date published.</li>\n<li><strong>Local Business Schema:</strong> Crucial for local businesses. It provides physical address, opening hours, contact details, and price ranges.</li>\n<li><strong>FAQ Schema:</strong> Displays questions and answers directly underneath your search listing.</li>\n<li><strong>Product Schema:</strong> Highlights price, reviews, and stock availability on e-commerce results.</li>\n</ol>\n<h2>Conclusion</h2>\n<p>Implementing schema markup is one of the most effective technical SEO tactics you can employ. It bridges the gap between text and semantic meaning, ensuring search engines display your content in the most attractive, clickable format possible.</p>",
+    "featuredImage": "/blog/schema-cover.png",
+    "category": "Technical SEO",
+    "tags": [
+      "Technical SEO",
+      "Schema Markup",
+      "Google Rich Results",
+      "Metadata"
+    ],
+    "metaTitle": "The Power of Schema Markup in Technical SEO | Saurav Vaghela",
+    "metaDescription": "Discover how structured data schema markup helps search engines index content, driving rich snippets and improving organic CTR.",
+    "focusKeyword": "Schema Markup",
+    "author": "Saurav Vaghela",
+    "status": "published",
+    "publishedAt": "2026-06-08T00:00:00.000Z",
+    "updatedAt": "2026-06-10T14:15:00.000Z",
+    "views": 53,
+    "featured": true
+  },
+  {
+    "id": "2",
+    "title": "Mastering Keyword Intent: Beyond Search Volume",
+    "slug": "mastering-keyword-intent",
+    "excerpt": "Chasing high-volume keywords is a common pitfall. Discover why aligning content with searcher intent drives qualified leads and higher conversions.",
+    "content": "<p>Many digital marketers make the mistake of choosing target keywords solely based on search volume. However, ranking for a keyword with 10,000 monthly searches is useless if the traffic doesn't convert. To build a truly successful SEO pipeline, you must master <strong>Keyword Intent</strong>.</p>\n<h2>Understanding the 4 Types of Search Intent</h2>\n<p>Search intent refers to the primary goal a user has when typing a query into a search engine. Broadly, search intent is divided into four categories:</p>\n<h3>1. Informational Intent</h3>\n<p>The searcher is looking for information or answers to a question. They are not looking to buy anything yet. Examples: <em>\"how does technical seo work\"</em> or <em>\"what is a canonical link\"</em>.</p>\n<h3>2. Navigational Intent</h3>\n<p>The searcher is trying to locate a specific website or brand. Examples: <em>\"Facebook login\"</em> or <em>\"Saurav Vaghela portfolio\"</em>.</p>\n<h3>3. Commercial Intent</h3>\n<p>The searcher is researching products, services, or brands with the intent of purchasing in the near future. They are comparing options. Examples: <em>\"best SEO tools for small business\"</em> or <em>\"Ahrefs vs SEMrush review\"</em>.</p>\n<h3>4. Transactional Intent</h3>\n<p>The searcher has already decided to buy and is ready to complete a transaction. These keywords have the highest conversion rates. Examples: <em>\"buy SEO audit service\"</em> or <em>\"hire digital marketing specialist\"</em>.</p>\n<h2>How to Optimize Content for Intent</h2>\n<p>Once you identify keyword intent, your landing pages must serve that intent directly:</p>\n<ul>\n<li>For <strong>Informational</strong> intent, write clear, thorough, and structured guides. Avoid hard-selling.</li>\n<li>For <strong>Commercial</strong> intent, design comparison charts, case studies, and clear benefit lists.</li>\n<li>For <strong>Transactional</strong> intent, optimize checkout pages, lead forms, and offer call-to-actions (CTAs).</li>\n</ul>\n<h2>Summary</h2>\n<p>By mapping your content marketing strategy to user intent rather than simple search volume, you filter out junk traffic, build search authority, and capture leads who are genuinely ready to convert.</p>",
+    "featuredImage": "/blog/intent-cover.png",
+    "category": "SEO Strategy",
+    "tags": [
+      "Keyword Research",
+      "SEO Strategy",
+      "Search Intent",
+      "Content Strategy"
+    ],
+    "metaTitle": "Mastering Keyword Intent: Beyond Search Volume | Saurav Vaghela",
+    "metaDescription": "Chasing high-volume keywords is an SEO trap. Learn how targeting informational, navigational, commercial, and transactional search intent boosts conversions.",
+    "focusKeyword": "Keyword Intent",
+    "author": "Saurav Vaghela",
+    "status": "published",
+    "publishedAt": "2026-05-24T00:00:00.000Z",
+    "updatedAt": "2026-06-10T14:15:00.000Z",
+    "views": 29,
+    "featured": false
+  },
+  {
+    "id": "3",
+    "title": "Demystifying Core Web Vitals for Organic Growth",
+    "slug": "demystifying-core-web-vitals",
+    "excerpt": "A developer-focused SEO guide explaining LCP, INP, and CLS, and how optimizations directly impact search engine indexing and ranking.",
+    "content": "<p>Google's Page Experience update made page speed and UX a key ranking factor. At the center of this evaluation are <strong>Core Web Vitals</strong>: three performance metrics that quantify the load speed, interactivity, and visual stability of a webpage.</p>\n<h2>The Three Core Web Vitals</h2>\n<h3>1. Largest Contentful Paint (LCP)</h3>\n<p><strong>Measures:</strong> Loading performance.</p>\n<p>LCP tracks how long it takes for the largest visual element on the screen (such as a hero image or main heading) to render. To pass Google's test, your LCP should occur within <strong>2.5 seconds</strong> of page load.</p>\n<h3>2. Interaction to Next Paint (INP)</h3>\n<p><strong>Measures:</strong> Page responsiveness.</p>\n<p>INP (which replaced First Input Delay) measures how responsive a page is to user actions like clicks, taps, and keyboard inputs. A good score is under <strong>200 milliseconds</strong>.</p>\n<h3>3. Cumulative Layout Shift (CLS)</h3>\n<p><strong>Measures:</strong> Visual stability.</p>\n<p>CLS calculates how much page content shifts unexpectedly during render (e.g., when a slow-loading image pushes down a text block you are reading). To pass, your CLS score should be <strong>0.1 or less</strong>.</p>\n<h2>Technical Fixes to Improve Scores</h2>\n<ul>\n<li><strong>For LCP:</strong> Compress and optimize images (use WebP/AVIF formats), implement lazy loading, and eliminate render-blocking JavaScript.</li>\n<li><strong>For INP:</strong> Optimize script execution times, defer unused JS, and avoid heavy blocking event handlers.</li>\n<li><strong>For CLS:</strong> Always specify dimensions (width and height) for images and video elements, and reserve layout space for dynamic ads.</li>\n</ul>\n<h2>Conclusion</h2>\n<p>Core Web Vitals align user experience with search engine indexing. By optimizing these performance pillars, you not only improve search engine placement but also lower bounce rates and boost user retention.</p>",
+    "featuredImage": "/blog/vitals-cover.png",
+    "category": "Web Performance",
+    "tags": [
+      "Core Web Vitals",
+      "Web Performance",
+      "User Experience",
+      "Google Rankings"
+    ],
+    "metaTitle": "Demystifying Core Web Vitals for Organic Growth | Saurav Vaghela",
+    "metaDescription": "A technical guide on Google Core Web Vitals (LCP, INP, CLS) explaining performance optimizations to secure search result growth.",
+    "focusKeyword": "Core Web Vitals",
+    "author": "Saurav Vaghela",
+    "status": "published",
+    "publishedAt": "2026-04-18T00:00:00.000Z",
+    "updatedAt": "2026-06-10T18:38:00.000Z",
+    "views": 85,
+    "featured": true
+  },
+  {
+    "id": "4",
+    "views": 1,
+    "status": "published",
+    "featured": false,
+    "publishedAt": "2026-06-10T19:03:48.874Z",
+    "updatedAt": "2026-06-10T19:03:48.874Z",
+    "excerpt": "A guide on the newly implemented admin visual editor.",
+    "content": "<p>This is a paragraph written in the visual block editor! It feels exactly like WordPress.</p>\n<h2>Technical Block Editing</h2>",
+    "featuredImage": "",
+    "category": "Technical SEO",
+    "tags": [],
+    "metaTitle": "Writing Like WordPress in NextJS | Saurav Vaghela",
+    "metaDescription": "A guide on the newly implemented admin visual editor.",
+    "focusKeyword": "",
+    "author": "Saurav Vaghela",
+    "title": "Writing Like WordPress in NextJS",
+    "slug": "writing-like-wordpress-in-nextjs"
+  }
+]

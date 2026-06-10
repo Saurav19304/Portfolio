@@ -6,6 +6,7 @@ import EducationAndSkills from "@/components/EducationAndSkills";
 import Contact from "@/components/Contact";
 import InstagramContent from "@/components/InstagramContent";
 import LinkedInPosts from "@/components/LinkedInPosts";
+import LatestWritings from "@/components/LatestWritings";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       <Projects />
       <InstagramContent />
       <LinkedInPosts />
+      <LatestWritings />
       <Experience />
       <EducationAndSkills />
       <Contact />
