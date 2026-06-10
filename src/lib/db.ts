@@ -3,6 +3,78 @@ import path from "path";
 import { BlogPost } from "./blogUtils";
 
 const dbFilePath = path.join(process.cwd(), "src/data/posts.db.json");
+const seoFilePath = path.join(process.cwd(), "src/data/seo.db.json");
+
+export interface PageSeoConfig {
+  title: string;
+  description: string;
+  keywords: string;
+  robots: string;
+  canonical: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+}
+
+export interface GeneralSeoConfig {
+  googleAnalyticsId: string;
+  googleSiteVerification: string;
+  schemaMarkup: string;
+}
+
+export interface SeoSettings {
+  home: PageSeoConfig;
+  blog: PageSeoConfig;
+  general: GeneralSeoConfig;
+}
+
+// Helper to read SEO database
+export async function getSeoSettings(): Promise<SeoSettings> {
+  try {
+    const data = await fs.readFile(seoFilePath, "utf8");
+    return JSON.parse(data) as SeoSettings;
+  } catch (error) {
+    console.error("SEO database read error, returning default settings:", error);
+    return {
+      home: {
+        title: "Saurav Vaghela | Digital Marketing & SEO Specialist",
+        description: "Portfolio of Saurav Vaghela, a Digital Marketing and SEO professional specializing in keyword research, technical SEO, and data-driven strategies.",
+        keywords: "Saurav Vaghela, Digital Marketing Specialist, SEO Specialist, Technical SEO, Keyword Research, SEO Consultant, Data-Driven Marketing Specialist",
+        robots: "index, follow",
+        canonical: "https://saurav.digital/",
+        ogTitle: "Saurav Vaghela | Digital Marketing & SEO Specialist",
+        ogDescription: "Portfolio of Saurav Vaghela, a Digital Marketing and SEO professional specializing in keyword research, technical SEO, and data-driven strategies.",
+        ogImage: "/og-image.png"
+      },
+      blog: {
+        title: "Writings & Insights | Saurav Vaghela",
+        description: "Data-driven strategies, technical SEO tutorials, keyword research principles, and updates from my digital marketing journey.",
+        keywords: "SEO, Content Marketing, WordPress, Next.js, Technical SEO",
+        robots: "index, follow",
+        canonical: "https://saurav.digital/blog",
+        ogTitle: "Writings & Insights | Saurav Vaghela",
+        ogDescription: "Data-driven strategies, technical SEO tutorials, keyword research principles, and updates from my digital marketing journey.",
+        ogImage: "/og-image.png"
+      },
+      general: {
+        googleAnalyticsId: "G-ZXXGPSHTHY",
+        googleSiteVerification: "",
+        schemaMarkup: "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Person\",\n  \"name\": \"Saurav Vaghela\",\n  \"url\": \"https://saurav.digital\",\n  \"jobTitle\": \"Digital Marketing & SEO Specialist\"\n}"
+      }
+    };
+  }
+}
+
+// Helper to save SEO database
+export async function saveSeoSettings(settings: SeoSettings): Promise<boolean> {
+  try {
+    await fs.writeFile(seoFilePath, JSON.stringify(settings, null, 2), "utf8");
+    return true;
+  } catch (error) {
+    console.error("SEO database write error:", error);
+    return false;
+  }
+}
 
 // Helper to read database
 export async function getPosts(): Promise<BlogPost[]> {

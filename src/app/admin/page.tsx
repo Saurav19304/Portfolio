@@ -50,6 +50,83 @@ export default function AdminDashboard() {
   const [isUploadingFeatured, setIsUploadingFeatured] = useState(false);
   const [uploadingBlockId, setUploadingBlockId] = useState<string | null>(null);
 
+  // Site-wide SEO Dashboard Mode & States
+  const [dashboardMode, setDashboardMode] = useState<"blog" | "seo">("blog");
+  const [activeSeoTab, setActiveSeoTab] = useState<"home" | "blog" | "general">("home");
+  const [isSavingSeo, setIsSavingSeo] = useState(false);
+  const [seoSettings, setSeoSettings] = useState<{
+    home: any;
+    blog: any;
+    general: any;
+  }>({
+    home: { title: "", description: "", keywords: "", robots: "index, follow", canonical: "", ogTitle: "", ogDescription: "", ogImage: "" },
+    blog: { title: "", description: "", keywords: "", robots: "index, follow", canonical: "", ogTitle: "", ogDescription: "", ogImage: "" },
+    general: { googleAnalyticsId: "", googleSiteVerification: "", schemaMarkup: "" }
+  });
+
+  const fetchSeoSettings = async () => {
+    try {
+      const res = await fetch("/api/seo");
+      if (res.ok) {
+        const data = await res.json();
+        setSeoSettings(data);
+      }
+    } catch (error) {
+      console.error("Failed to load SEO settings:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchSeoSettings();
+    }
+  }, [isAuthenticated]);
+
+  const handleSaveSeo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingSeo(true);
+    try {
+      const res = await fetch("/api/seo", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(seoSettings),
+      });
+
+      if (res.ok) {
+        showNotification("success", "Site-wide SEO configurations saved successfully!");
+      } else {
+        const errData = await res.json();
+        throw new Error(errData.error || "Failed to save SEO settings");
+      }
+    } catch (error: any) {
+      console.error(error);
+      showNotification("error", error.message || "Failed to save SEO settings.");
+    } finally {
+      setIsSavingSeo(false);
+    }
+  };
+
+  const updateHomeSeo = (fields: any) => {
+    setSeoSettings((prev) => ({
+      ...prev,
+      home: { ...prev.home, ...fields }
+    }));
+  };
+
+  const updateBlogSeo = (fields: any) => {
+    setSeoSettings((prev) => ({
+      ...prev,
+      blog: { ...prev.blog, ...fields }
+    }));
+  };
+
+  const updateGeneralSeo = (fields: any) => {
+    setSeoSettings((prev) => ({
+      ...prev,
+      general: { ...prev.general, ...fields }
+    }));
+  };
+
   // Auto-generate slug from title if not editing an existing slug
   useEffect(() => {
     if (!editingSlug) {
@@ -599,15 +676,39 @@ export default function AdminDashboard() {
               </Link>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-              Blog Editor Dashboard
+              {dashboardMode === "blog" ? "Blog Editor Dashboard" : "Site-wide SEO Manager"}
             </h1>
             <p className="text-white/50 text-sm mt-1">
-              Create and manage portfolio articles without writing HTML.
+              {dashboardMode === "blog" 
+                ? "Create and manage portfolio articles without writing HTML."
+                : "Manage page meta tags, analytics tracking, verification keys, and custom JSON-LD schema."}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            {editingSlug && (
+            {/* Toggle Switcher */}
+            <div className="flex rounded-full overflow-hidden bg-white/5 border border-white/10 p-0.5 mr-2">
+              <button
+                type="button"
+                onClick={() => setDashboardMode("blog")}
+                className={`px-4 py-2 rounded-full text-xs font-bold tracking-wider transition-colors ${
+                  dashboardMode === "blog" ? "bg-white text-black font-extrabold" : "text-white/60 hover:text-white"
+                }`}
+              >
+                Blog Posts
+              </button>
+              <button
+                type="button"
+                onClick={() => setDashboardMode("seo")}
+                className={`px-4 py-2 rounded-full text-xs font-bold tracking-wider transition-colors ${
+                  dashboardMode === "seo" ? "bg-white text-black font-extrabold" : "text-white/60 hover:text-white"
+                }`}
+              >
+                SEO Settings
+              </button>
+            </div>
+
+            {dashboardMode === "blog" && editingSlug && (
               <button
                 onClick={clearForm}
                 className="px-5 py-2.5 rounded-full text-xs font-bold tracking-wider border border-white/10 hover:bg-white/5 transition-colors"
@@ -616,7 +717,7 @@ export default function AdminDashboard() {
               </button>
             )}
             <a
-              href="http://localhost:3000/blog"
+              href="/"
               target="_blank"
               rel="noreferrer"
               className="px-5 py-2.5 rounded-full text-xs font-bold tracking-wider bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
@@ -633,8 +734,10 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Existing Articles Table/Listing */}
-        <section className="mb-16 rounded-3xl border border-white/5 bg-white/[0.01] p-6 backdrop-blur-sm">
+        {dashboardMode === "blog" ? (
+          <>
+            {/* Existing Articles Table/Listing */}
+            <section className="mb-16 rounded-3xl border border-white/5 bg-white/[0.01] p-6 backdrop-blur-sm">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
             <svg className="w-5 h-5 text-white/50" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 4a2 2 0 00-2-2m-2 3h.01M5.5 8.5h-.01M5.5 12h.01M5.5 15.5h-.01" />
@@ -1326,6 +1429,451 @@ export default function AdminDashboard() {
           </div>
 
         </form>
+      </>
+    ) : (
+      <form onSubmit={handleSaveSeo} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Area (2 Columns) */}
+        <div className="lg:col-span-2 space-y-8">
+          
+          {/* Tab Selector */}
+          <div className="flex border-b border-white/5">
+            <button
+              type="button"
+              onClick={() => setActiveSeoTab("home")}
+              className={`px-6 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+                activeSeoTab === "home"
+                  ? "border-white text-white"
+                  : "border-transparent text-white/40 hover:text-white/70"
+              }`}
+            >
+              🏠 Homepage SEO
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveSeoTab("blog")}
+              className={`px-6 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+                activeSeoTab === "blog"
+                  ? "border-white text-white"
+                  : "border-transparent text-white/40 hover:text-white/70"
+              }`}
+            >
+              📰 Blog Page SEO
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveSeoTab("general")}
+              className={`px-6 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+                activeSeoTab === "general"
+                  ? "border-white text-white"
+                  : "border-transparent text-white/40 hover:text-white/70"
+              }`}
+            >
+              ⚙️ Site Integrations
+            </button>
+          </div>
+
+          {/* Form Content */}
+          {activeSeoTab === "home" && (
+            <div className="rounded-3xl border border-white/5 bg-white/[0.01] p-6 backdrop-blur-sm space-y-6">
+              <h3 className="text-lg font-bold">Homepage Metadata</h3>
+              
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-white/40">
+                    Meta Title
+                  </label>
+                  <span className={`text-[10px] font-mono ${
+                    (seoSettings.home.title || "").length > 60 ? "text-amber-400" : "text-white/30"
+                  }`}>
+                    {(seoSettings.home.title || "").length}/60 chars
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Saurav Vaghela | Digital Marketing & SEO Specialist"
+                  value={seoSettings.home.title || ""}
+                  onChange={(e) => updateHomeSeo({ title: e.target.value })}
+                  className="w-full px-5 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-white/30 transition-colors text-white placeholder-white/20"
+                  required
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-white/40">
+                    Meta Description
+                  </label>
+                  <span className={`text-[10px] font-mono ${
+                    (seoSettings.home.description || "").length > 160 ? "text-amber-400" : "text-white/30"
+                  }`}>
+                    {(seoSettings.home.description || "").length}/160 chars
+                  </span>
+                </div>
+                <textarea
+                  rows={3}
+                  placeholder="A short description..."
+                  value={seoSettings.home.description || ""}
+                  onChange={(e) => updateHomeSeo({ description: e.target.value })}
+                  className="w-full px-5 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-white/30 transition-colors text-white placeholder-white/20 resize-none leading-relaxed"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                    Focus Keywords (Comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="SEO Specialist, Digital Marketing"
+                    value={seoSettings.home.keywords || ""}
+                    onChange={(e) => updateHomeSeo({ keywords: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                    Robots Settings
+                  </label>
+                  <select
+                    value={seoSettings.home.robots || "index, follow"}
+                    onChange={(e) => updateHomeSeo({ robots: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-[#121212] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white cursor-pointer"
+                  >
+                    <option value="index, follow">index, follow (Default - Search Engine Allowed)</option>
+                    <option value="noindex, nofollow">noindex, nofollow (Hidden from Search Engines)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  Canonical URL
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://saurav.digital/"
+                  value={seoSettings.home.canonical || ""}
+                  onChange={(e) => updateHomeSeo({ canonical: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20"
+                />
+              </div>
+
+              <div className="border-t border-white/5 pt-6 space-y-5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-white/60">Open Graph Social Meta Tags</h4>
+                
+                <div>
+                  <label className="block text-xs text-white/40 mb-1.5">OG Title</label>
+                  <input
+                    type="text"
+                    placeholder="Social share title..."
+                    value={seoSettings.home.ogTitle || ""}
+                    onChange={(e) => updateHomeSeo({ ogTitle: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-white/40 mb-1.5">OG Description</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Social share description..."
+                    value={seoSettings.home.ogDescription || ""}
+                    onChange={(e) => updateHomeSeo({ ogDescription: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20 resize-none leading-relaxed"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-white/40 mb-1.5">OG Share Image Path</label>
+                  <input
+                    type="text"
+                    placeholder="/og-image.png"
+                    value={seoSettings.home.ogImage || ""}
+                    onChange={(e) => updateHomeSeo({ ogImage: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20"
+                  />
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {activeSeoTab === "blog" && (
+            <div className="rounded-3xl border border-white/5 bg-white/[0.01] p-6 backdrop-blur-sm space-y-6">
+              <h3 className="text-lg font-bold">Blog Page Metadata</h3>
+              
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-white/40">
+                    Meta Title
+                  </label>
+                  <span className={`text-[10px] font-mono ${
+                    (seoSettings.blog.title || "").length > 60 ? "text-amber-400" : "text-white/30"
+                  }`}>
+                    {(seoSettings.blog.title || "").length}/60 chars
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Writings & Insights | Saurav Vaghela"
+                  value={seoSettings.blog.title || ""}
+                  onChange={(e) => updateBlogSeo({ title: e.target.value })}
+                  className="w-full px-5 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-white/30 transition-colors text-white placeholder-white/20"
+                  required
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-white/40">
+                    Meta Description
+                  </label>
+                  <span className={`text-[10px] font-mono ${
+                    (seoSettings.blog.description || "").length > 160 ? "text-amber-400" : "text-white/30"
+                  }`}>
+                    {(seoSettings.blog.description || "").length}/160 chars
+                  </span>
+                </div>
+                <textarea
+                  rows={3}
+                  placeholder="A short description..."
+                  value={seoSettings.blog.description || ""}
+                  onChange={(e) => updateBlogSeo({ description: e.target.value })}
+                  className="w-full px-5 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-white/30 transition-colors text-white placeholder-white/20 resize-none leading-relaxed"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                    Focus Keywords (Comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="SEO, marketing blog"
+                    value={seoSettings.blog.keywords || ""}
+                    onChange={(e) => updateBlogSeo({ keywords: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                    Robots Settings
+                  </label>
+                  <select
+                    value={seoSettings.blog.robots || "index, follow"}
+                    onChange={(e) => updateBlogSeo({ robots: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-[#121212] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white cursor-pointer"
+                  >
+                    <option value="index, follow">index, follow (Default - Search Engine Allowed)</option>
+                    <option value="noindex, nofollow">noindex, nofollow (Hidden from Search Engines)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  Canonical URL
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://saurav.digital/blog"
+                  value={seoSettings.blog.canonical || ""}
+                  onChange={(e) => updateBlogSeo({ canonical: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20"
+                />
+              </div>
+
+              <div className="border-t border-white/5 pt-6 space-y-5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-white/60">Open Graph Social Meta Tags</h4>
+                
+                <div>
+                  <label className="block text-xs text-white/40 mb-1.5">OG Title</label>
+                  <input
+                    type="text"
+                    placeholder="Social share title..."
+                    value={seoSettings.blog.ogTitle || ""}
+                    onChange={(e) => updateBlogSeo({ ogTitle: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-white/40 mb-1.5">OG Description</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Social share description..."
+                    value={seoSettings.blog.ogDescription || ""}
+                    onChange={(e) => updateBlogSeo({ ogDescription: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20 resize-none leading-relaxed"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-white/40 mb-1.5">OG Share Image Path</label>
+                  <input
+                    type="text"
+                    placeholder="/og-image.png"
+                    value={seoSettings.blog.ogImage || ""}
+                    onChange={(e) => updateBlogSeo({ ogImage: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 text-white placeholder-white/20"
+                  />
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {activeSeoTab === "general" && (
+            <div className="rounded-3xl border border-white/5 bg-white/[0.01] p-6 backdrop-blur-sm space-y-6">
+              <h3 className="text-lg font-bold">Analytics & Site Integrations</h3>
+              
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  Google Analytics Measurement ID (GA4)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. G-ZXXGPSHTHY"
+                  value={seoSettings.general.googleAnalyticsId || ""}
+                  onChange={(e) => updateGeneralSeo({ googleAnalyticsId: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-white/30 transition-colors text-white placeholder-white/20 font-mono"
+                />
+                <p className="text-[10px] text-white/30 mt-1">Google Analytics tracking code is injected site-wide.</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  Google Site Verification Token
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. key-verification-token"
+                  value={seoSettings.general.googleSiteVerification || ""}
+                  onChange={(e) => updateGeneralSeo({ googleSiteVerification: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-white/30 transition-colors text-white placeholder-white/20 font-mono"
+                />
+                <p className="text-[10px] text-white/30 mt-1">Required to verify website ownership in Google Search Console.</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  JSON-LD Structured Schema Markup (Site-wide)
+                </label>
+                <textarea
+                  rows={8}
+                  placeholder='{\n  "@context": "https://schema.org",\n  "@type": "Person",\n  "name": "Saurav Vaghela"\n}'
+                  value={seoSettings.general.schemaMarkup || ""}
+                  onChange={(e) => updateGeneralSeo({ schemaMarkup: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-xs focus:outline-none focus:border-white/30 transition-colors text-white placeholder-white/20 font-mono leading-relaxed"
+                />
+                <p className="text-[10px] text-white/30 mt-1">Paste valid JSON-LD schema snippet to enable Google rich snippets.</p>
+              </div>
+
+            </div>
+          )}
+
+        </div>
+
+        {/* Right Sidebar (1 Column) */}
+        <div className="space-y-6">
+          
+          {/* Save Card */}
+          <div className="rounded-3xl border border-white/5 bg-white/[0.01] p-6 backdrop-blur-sm space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white/60 pb-3 border-b border-white/5">
+              Publish Changes
+            </h3>
+            <button
+              type="submit"
+              disabled={isSavingSeo}
+              className="w-full py-3.5 rounded-2xl bg-white text-black font-bold text-sm hover:bg-white/90 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-lg shadow-white/5 flex items-center justify-center gap-2"
+            >
+              {isSavingSeo ? (
+                <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              ) : (
+                "Save SEO Config"
+              )}
+            </button>
+          </div>
+
+          {/* Dynamic Google Snippet Preview (For Home & Blog tabs) */}
+          {(activeSeoTab === "home" || activeSeoTab === "blog") && (
+            <div className="rounded-3xl border border-white/5 bg-white/[0.01] p-6 backdrop-blur-sm space-y-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-rose-300/80 pb-3 border-b border-white/5">
+                Google Search Preview
+              </h3>
+              
+              <div className="bg-white p-5 rounded-2xl text-black font-sans leading-normal">
+                {/* Breadcrumb path */}
+                <div className="text-[12px] text-[#202124] flex items-center gap-1 mb-1 font-sans truncate">
+                  <span>saurav.digital</span>
+                  <span className="text-[#70757a] text-[10px] font-sans">›</span>
+                  <span className="text-[#70757a] font-sans truncate">
+                    {activeSeoTab === "blog" ? "blog" : ""}
+                  </span>
+                </div>
+
+                {/* Meta Title */}
+                <h4 className="text-[19px] text-[#1a0dab] hover:underline cursor-pointer font-medium font-sans mb-1 leading-snug line-clamp-2">
+                  {activeSeoTab === "home" 
+                    ? (seoSettings.home.title || "Saurav Vaghela | Portfolio")
+                    : (seoSettings.blog.title || "Writings & Insights | Saurav Vaghela")}
+                </h4>
+
+                {/* Meta Description snippet */}
+                <p className="text-[14px] text-[#4d5156] font-sans leading-normal line-clamp-3">
+                  {activeSeoTab === "home"
+                    ? (seoSettings.home.description || "Portfolio details and SEO services.")
+                    : (seoSettings.blog.description || "Digital Marketing guides and tips.")}
+                </p>
+              </div>
+              <p className="text-[10px] text-white/30 text-center">Simulated desktop snippet view. Max width applies on live Google SERPs.</p>
+            </div>
+          )}
+
+          {/* OpenGraph Card Preview */}
+          {(activeSeoTab === "home" || activeSeoTab === "blog") && (
+            <div className="rounded-3xl border border-white/5 bg-white/[0.01] p-6 backdrop-blur-sm space-y-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-blue-300/80 pb-3 border-b border-white/5">
+                Facebook Share Preview
+              </h3>
+              
+              <div className="rounded-2xl border border-white/10 bg-[#1e1e1e] overflow-hidden">
+                {/* OG Image placeholder/render */}
+                <div className="aspect-[1.91/1] bg-zinc-900 border-b border-white/5 flex items-center justify-center relative">
+                  {activeSeoTab === "home" && seoSettings.home.ogImage ? (
+                    <img src={seoSettings.home.ogImage} alt="OG Preview" className="w-full h-full object-cover" />
+                  ) : activeSeoTab === "blog" && seoSettings.blog.ogImage ? (
+                    <img src={seoSettings.blog.ogImage} alt="OG Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-[10px] text-white/20 uppercase tracking-widest font-mono font-bold">1200 x 630 OG Image</span>
+                  )}
+                </div>
+                
+                {/* OG text details */}
+                <div className="p-3 space-y-1 bg-white/[0.02]">
+                  <span className="text-[9px] uppercase tracking-wider font-mono text-white/30">saurav.digital</span>
+                  <h4 className="text-xs font-semibold text-white/80 line-clamp-1">
+                    {activeSeoTab === "home" 
+                      ? (seoSettings.home.ogTitle || seoSettings.home.title || "Saurav Vaghela | Portfolio")
+                      : (seoSettings.blog.ogTitle || seoSettings.blog.title || "Writings & Insights")}
+                  </h4>
+                  <p className="text-[10px] text-white/40 line-clamp-2 leading-relaxed font-light">
+                    {activeSeoTab === "home"
+                      ? (seoSettings.home.ogDescription || seoSettings.home.description || "Portfolio details...")
+                      : (seoSettings.blog.ogDescription || seoSettings.blog.description || "Writings & Insights...")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </form>
+    )}
 
       </div>
     </main>

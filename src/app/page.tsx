@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { getSeoSettings } from "@/lib/db";
 import ScrollyCanvas from "@/components/ScrollyCanvas";
 import AboutMe from "@/components/AboutMe";
 import Projects from "@/components/Projects";
@@ -7,6 +9,38 @@ import Contact from "@/components/Contact";
 import InstagramContent from "@/components/InstagramContent";
 import LinkedInPosts from "@/components/LinkedInPosts";
 import LatestWritings from "@/components/LatestWritings";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoSettings();
+  const homeSeo = seo?.home;
+
+  if (!homeSeo) return {};
+
+  return {
+    title: homeSeo.title,
+    description: homeSeo.description,
+    keywords: homeSeo.keywords ? homeSeo.keywords.split(",").map(k => k.trim()) : [],
+    alternates: {
+      canonical: homeSeo.canonical || "https://saurav.digital/",
+    },
+    robots: {
+      index: !homeSeo.robots?.includes("noindex"),
+      follow: !homeSeo.robots?.includes("nofollow"),
+    },
+    openGraph: {
+      title: homeSeo.ogTitle || homeSeo.title,
+      description: homeSeo.ogDescription || homeSeo.description,
+      images: homeSeo.ogImage ? [{ url: homeSeo.ogImage }] : [],
+      url: "https://saurav.digital/",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: homeSeo.ogTitle || homeSeo.title,
+      description: homeSeo.ogDescription || homeSeo.description,
+      images: homeSeo.ogImage ? [homeSeo.ogImage] : [],
+    }
+  };
+}
 
 export default function Home() {
   return (

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import Header from "@/components/Header";
+import { getSeoSettings } from "@/lib/db";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -72,27 +73,49 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const seo = await getSeoSettings();
+  const gaId = seo?.general?.googleAnalyticsId || "G-ZXXGPSHTHY";
+  const googleSiteVerification = seo?.general?.googleSiteVerification || "";
+  const schemaMarkup = seo?.general?.schemaMarkup || "";
+
   return (
     <html lang="en">
       <head>
+        {/* Google Site Verification */}
+        {googleSiteVerification && (
+          <meta name="google-site-verification" content={googleSiteVerification} />
+        )}
+
         {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-ZXXGPSHTHY"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-ZXXGPSHTHY');
-          `}
-        </Script>
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}');
+              `}
+            </Script>
+          </>
+        )}
+
+        {/* Dynamic Schema Markup */}
+        {schemaMarkup && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: schemaMarkup }}
+          />
+        )}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
