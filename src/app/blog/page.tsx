@@ -37,7 +37,7 @@ export default function BlogIndex() {
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     
     return matchesCategory && matchesSearch;
