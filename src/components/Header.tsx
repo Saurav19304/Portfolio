@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -8,13 +9,26 @@ export default function Header() {
   const pathname = usePathname();
   const isBlog = pathname.startsWith("/blog");
 
+  // Clean URL hash on mount/path change if present
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      const timer = setTimeout(() => {
+        window.history.replaceState(
+          null,
+          "",
+          window.location.pathname
+        );
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname]);
+
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     if (pathname === "/") {
       e.preventDefault();
       const element = document.getElementById(targetId);
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
-        window.history.pushState(null, "", `#${targetId}`);
       }
     }
   };
@@ -23,7 +37,6 @@ export default function Header() {
     if (pathname === "/") {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
-      window.history.pushState(null, "", "/");
     }
   };
 
