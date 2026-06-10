@@ -5,6 +5,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --background: #121212;
   --foreground: #ffffff;

@@ -8,6 +8,25 @@ export default function Header() {
   const pathname = usePathname();
   const isBlog = pathname.startsWith("/blog");
 
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        window.history.pushState(null, "", `#${targetId}`);
+      }
+    }
+  };
+
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.history.pushState(null, "", "/");
+    }
+  };
+
   return (
     <motion.header
       initial={{ y: -50, opacity: 0 }}
@@ -17,22 +36,22 @@ export default function Header() {
     >
       <div className="w-full py-3 px-6 md:px-8 rounded-full bg-white/[0.02] backdrop-blur-xl border border-white/10 shadow-2xl flex items-center justify-between pointer-events-auto">
         {/* Brand/Logo */}
-        <Link href="/" className="text-sm font-bold tracking-tight text-white hover:text-white/80 transition-colors">
+        <Link href="/" className="text-sm font-bold tracking-tight text-white hover:text-white/80 transition-colors" onClick={handleLogoClick}>
           Saurav.digital
         </Link>
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-8 text-xs font-semibold tracking-wider text-white/60">
-          <Link href="/#about" className="hover:text-white transition-colors">
+          <Link href="/#about" className="hover:text-white transition-colors" onClick={(e) => handleScroll(e, "about")}>
             ABOUT
           </Link>
-          <Link href="/#projects" className="hover:text-white transition-colors">
+          <Link href="/#projects" className="hover:text-white transition-colors" onClick={(e) => handleScroll(e, "projects")}>
             PROJECTS
           </Link>
-          <Link href="/#experience" className="hover:text-white transition-colors">
+          <Link href="/#experience" className="hover:text-white transition-colors" onClick={(e) => handleScroll(e, "experience")}>
             EXPERIENCE
           </Link>
-          <Link href="/#contact" className="hover:text-white transition-colors">
+          <Link href="/#contact" className="hover:text-white transition-colors" onClick={(e) => handleScroll(e, "contact")}>
             CONTACT
           </Link>
         </nav>

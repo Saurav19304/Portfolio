@@ -31,7 +31,7 @@ const PROJECTS = [
 
 export default function Projects() {
   return (
-    <section className="relative z-20 bg-[#121212] py-32 px-6 lg:px-12 text-white border-t border-white/5">
+    <section id="projects" className="relative z-20 bg-[#121212] py-32 px-6 lg:px-12 text-white border-t border-white/5">
       <div className="max-w-7xl mx-auto">
         <div className="mb-20">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Selected Work</h2>

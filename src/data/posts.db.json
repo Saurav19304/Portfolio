@@ -44,7 +44,7 @@
     "status": "published",
     "publishedAt": "2026-05-24T00:00:00.000Z",
     "updatedAt": "2026-06-10T14:15:00.000Z",
-    "views": 29,
+    "views": 30,
     "featured": false
   },
   {
@@ -73,7 +73,7 @@
   },
   {
     "id": "4",
-    "views": 2,
+    "views": 3,
     "status": "published",
     "featured": false,
     "publishedAt": "2026-06-10T19:03:48.874Z",
