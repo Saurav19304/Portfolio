@@ -4,6 +4,18 @@ import { motion } from "framer-motion";
 
 const LINKEDIN_POSTS = [
   {
+    id: 5,
+    title: "Project Mary Rose Presentation",
+    description: "Presented our collaborative digital marketing strategies and concepts for The Mary Rose Museum alongside my Apollo Media team members under Dr. Mona N.'s guidance.",
+    link: "https://www.linkedin.com/posts/sauravvaghela19_appollomedia-projectmaryrose-maryrosemuseum-share-7467231074935373824-Aw41/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEvbroIBnF2_ny4UJu1FyFevVpj7JUY4f_s",
+  },
+  {
+    id: 4,
+    title: "BBC Southampton Open Evening",
+    description: "Attended the BBC Southampton Open Evening, gaining behind-the-scenes insights into live broadcasting, audience engagement, and networking with presenter Edward Sault.",
+    link: "https://www.linkedin.com/posts/sauravvaghela19_bbc-networking-digitalmarketing-ugcPost-7443385269308899328-u_ky/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEvbroIBnF2_ny4UJu1FyFevVpj7JUY4f_s",
+  },
+  {
     id: 1,
     title: "LinkedIn Learning Certification Post",
     description: "Shared my Microsoft LinkedIn Learning certification and learning progress.",

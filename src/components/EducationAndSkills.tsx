@@ -17,6 +17,12 @@ const EDUCATION = [
 
 const CERTIFICATIONS = [
   {
+    title: "Digital Skills: Digital Marketing",
+    issuer: "Accenture (via FutureLearn)",
+    period: "2026",
+    details: "Completed Accenture's certified course focusing on Search Engine Optimisation (SEO), Pay-Per-Click (PPC), Display Advertising, Email Marketing, Customer Targeting, and Strategy Integration.",
+  },
+  {
     title: "Data Analytics Certification",
     issuer: "Tops Technology",
     period: "2023 – 2024",
