@@ -23,12 +23,6 @@ const CERTIFICATIONS = [
     details: "Completed Accenture's certified course focusing on Search Engine Optimisation (SEO), Pay-Per-Click (PPC), Display Advertising, Email Marketing, Customer Targeting, and Strategy Integration.",
   },
   {
-    title: "Data Analytics Certification",
-    issuer: "Tops Technology",
-    period: "2023 – 2024",
-    details: "Data Visualization, Statistical Analysis, Dashboard Creation, Business Data Insights",
-  },
-  {
     title: "Digital Marketing Certification",
     issuer: "Digital Azadi",
     period: "2024",
@@ -39,6 +33,12 @@ const CERTIFICATIONS = [
     issuer: "LinkedIn Learning",
     period: "2024",
     details: "Completed Microsoft certification course focusing on digital tools, productivity, and professional development.",
+  },
+  {
+    title: "Data Analytics Certification",
+    issuer: "Tops Technology",
+    period: "2023 – 2024",
+    details: "Data Visualization, Statistical Analysis, Dashboard Creation, Business Data Insights",
   },
 ];
 
