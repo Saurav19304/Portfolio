@@ -5,7 +5,7 @@ import { useScroll, useMotionValueEvent } from "framer-motion";
 
 import Overlay from "./Overlay";
 
-const FRAME_COUNT = 75;
+const FRAME_COUNT = 119;
 
 export default function ScrollyCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -25,8 +25,8 @@ export default function ScrollyCanvas() {
 
       for (let i = 0; i < FRAME_COUNT; i++) {
         const img = new Image();
-        const indexStr = i.toString().padStart(2, "0");
-        img.src = `/sequence/frame_${indexStr}_delay-0.066s.png`;
+        const indexStr = i.toString().padStart(8, "0");
+        img.src = `/sequence/Frame${indexStr}.webp`;
         loadedImages.push(img);
       }
       imagesRef.current = loadedImages;
@@ -64,48 +64,50 @@ export default function ScrollyCanvas() {
     let drawWidth, drawHeight, offsetX, offsetY;
 
     if (canvasRatio > imgRatio) {
-        // Canvas is wider than image relative to height
-        drawWidth = canvas.width;
-        drawHeight = canvas.width / imgRatio;
-        offsetX = 0;
-        offsetY = (canvas.height - drawHeight) / 2;
+      // Canvas is wider than image relative to height
+      drawWidth = canvas.width;
+      drawHeight = canvas.width / imgRatio;
+      offsetX = 0;
+      offsetY = (canvas.height - drawHeight) / 2;
     } else {
-        // Canvas is taller than image relative to width
-        drawHeight = canvas.height;
-        drawWidth = canvas.height * imgRatio;
-        offsetX = (canvas.width - drawWidth) / 2;
-        offsetY = 0;
+      // Canvas is taller than image relative to width
+      drawHeight = canvas.height;
+      drawWidth = canvas.height * imgRatio;
+      offsetX = (canvas.width - drawWidth) / 2;
+      offsetY = 0;
     }
 
     // Clear and draw
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
   };
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     const maxIndex = FRAME_COUNT - 1;
     let nextIndex = Math.round(latest * maxIndex);
-    
+
     // Safety bounds
     if (nextIndex < 0) nextIndex = 0;
     if (nextIndex > maxIndex) nextIndex = maxIndex;
 
     if (nextIndex !== currentFrameIndex.current) {
-        currentFrameIndex.current = nextIndex;
-        // Optimization: requestAnimationFrame
-        requestAnimationFrame(() => renderFrame(nextIndex));
+      currentFrameIndex.current = nextIndex;
+      // Optimization: requestAnimationFrame
+      requestAnimationFrame(() => renderFrame(nextIndex));
     }
   });
 
   // Synchronize canvas dimensions before drawing
   useEffect(() => {
     const updateCanvasSize = () => {
-        const canvas = canvasRef.current;
-        if (canvas) {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            renderFrame(currentFrameIndex.current);
-        }
+      const canvas = canvasRef.current;
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        renderFrame(currentFrameIndex.current);
+      }
     }
     updateCanvasSize();
   }, []);
