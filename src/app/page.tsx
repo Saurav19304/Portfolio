@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getSeoSettings } from "@/lib/db";
+import { getSeoSettings, getProfile, getCaseStudies } from "@/lib/db";
 import ScrollyCanvas from "@/components/ScrollyCanvas";
 import AboutMe from "@/components/AboutMe";
 import Projects from "@/components/Projects";
@@ -42,9 +42,96 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function Home() {
+export default async function Home() {
+  const profile = await getProfile().catch(() => null);
+  const caseStudies = await getCaseStudies().catch(() => []);
+
+  // 1. Person Schema Setup
+  const personSchema: any = {
+    "@context": "https://schema.org",
+    "@id": "https://saurav.digital/#person",
+    "@type": "Person",
+    "name": "Saurav Vaghela",
+    "url": "https://saurav.digital",
+    "jobTitle": "Digital Marketing & SEO Specialist",
+    "image": "https://saurav.digital/og-image.png"
+  };
+
+  if (profile) {
+    if (profile.about?.text) {
+      personSchema.description = profile.about.text;
+    }
+    if (profile.skills && profile.skills.length > 0) {
+      personSchema.knowsAbout = [...profile.skills, ...(profile.tools || [])];
+    }
+    if (profile.contact) {
+      personSchema.email = profile.contact.email;
+      personSchema.telephone = profile.contact.phone;
+      personSchema.address = {
+        "@type": "PostalAddress",
+        "addressLocality": profile.contact.location || "Southampton",
+        "addressCountry": "UK"
+      };
+      
+      const socials = [];
+      if (profile.contact.linkedinUrl) socials.push(profile.contact.linkedinUrl);
+      personSchema.sameAs = socials;
+    }
+    if (profile.education && profile.education.length > 0) {
+      personSchema.alumniOf = profile.education.map(edu => ({
+        "@type": "EducationalOrganization",
+        "name": edu.institution,
+        "description": edu.degree
+      }));
+    }
+    if (profile.certifications && profile.certifications.length > 0) {
+      personSchema.hasCredential = profile.certifications.map(cert => ({
+        "@type": "EducationalOccupationalCredential",
+        "name": cert.title,
+        "credentialCategory": "Certification",
+        "recognizedBy": {
+          "@type": "Organization",
+          "name": cert.issuer
+        }
+      }));
+    }
+  }
+
+  // 2. WebSite Schema Setup
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Saurav Vaghela | Digital Marketing & SEO Specialist",
+    "url": "https://saurav.digital",
+    "publisher": {
+      "@id": "https://saurav.digital/#person"
+    }
+  };
+
+  // 3. Project / Case Study Schema Setup
+  const caseStudiesSchema = caseStudies.map(cs => ({
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": cs.title,
+    "creator": {
+      "@id": "https://saurav.digital/#person"
+    },
+    "description": cs.shortDescription,
+    "alternativeHeadline": `${cs.metricLabel}: ${cs.metricValue}`,
+    "publisher": {
+      "@id": "https://saurav.digital/#person"
+    }
+  }));
+
+  const schemasArray = [personSchema, websiteSchema, ...caseStudiesSchema];
+
   return (
     <main className="min-h-screen bg-[#121212] selection:bg-white/30 selection:text-white">
+      {/* Inject Rich JSON-LD Schemas dynamically */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemasArray) }}
+      />
       <ScrollyCanvas />
       <AboutMe />
       <Projects />
