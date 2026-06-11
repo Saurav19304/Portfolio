@@ -26,5 +26,12 @@
     "link": "https://www.instagram.com/reel/DVeYj_ADPly/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==",
     "mediaSrc": "/insta-video.mp4",
     "type": "video"
+  },
+  {
+    "id": 5,
+    "title": "Car Edits",
+    "link": "https://www.instagram.com/reel/DXJXG0XDDLa/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==",
+    "mediaSrc": "/car-juke.mp4",
+    "type": "video"
   }
 ]
