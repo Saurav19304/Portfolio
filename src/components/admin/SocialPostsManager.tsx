@@ -80,6 +80,18 @@ export default function SocialPostsManager({ showNotification }: SocialPostsMana
     const isVideoFile = file.type.startsWith("video/");
     setIgType(isVideoFile ? "video" : "image");
 
+    // Warn if file is larger than Vercel's 4.5MB body limit
+    const sizeInMB = file.size / (1024 * 1024);
+    if (sizeInMB > 4.5) {
+      const proceed = confirm(
+        `Warning: This file is ${sizeInMB.toFixed(1)}MB. The live hosting platform (e.g., Vercel) has a strict 4.5MB size limit on uploads. If this site is live, the upload will likely fail.\n\nDo you want to attempt the upload anyway?`
+      );
+      if (!proceed) {
+        e.target.value = ""; // Clear file selector
+        return;
+      }
+    }
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -90,14 +102,20 @@ export default function SocialPostsManager({ showNotification }: SocialPostsMana
         body: formData
       });
 
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        if (res.status === 413) {
+          throw new Error("File is too large for the hosting server limit (max 4.5MB). Please compress the video or enter a direct URL instead.");
+        }
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Upload failed");
+      }
       const data = await res.json();
 
       setIgMediaSrc(data.url);
       showNotification("success", "Media uploaded successfully!");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      showNotification("error", "Failed to upload media.");
+      showNotification("error", err.message || "Failed to upload media.");
     } finally {
       setIsUploading(false);
     }

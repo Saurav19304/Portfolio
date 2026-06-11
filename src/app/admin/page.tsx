@@ -298,6 +298,18 @@ export default function AdminDashboard() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Warn if file is larger than Vercel's 4.5MB body limit
+    const sizeInMB = file.size / (1024 * 1024);
+    if (sizeInMB > 4.5) {
+      const proceed = confirm(
+        `Warning: This file is ${sizeInMB.toFixed(1)}MB. The live hosting platform (e.g., Vercel) has a strict 4.5MB size limit on uploads. If this site is live, the upload will likely fail.\n\nDo you want to attempt the upload anyway?`
+      );
+      if (!proceed) {
+        e.target.value = ""; // Clear file selector
+        return;
+      }
+    }
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -313,7 +325,13 @@ export default function AdminDashboard() {
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        if (res.status === 413) {
+          throw new Error("File is too large for the hosting server limit (max 4.5MB). Please compress the image or enter a direct URL instead.");
+        }
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Upload failed");
+      }
       const data = await res.json();
 
       if (blockId) {
@@ -322,9 +340,9 @@ export default function AdminDashboard() {
         setFeaturedImage(data.url);
       }
       showNotification("success", "Image uploaded successfully!");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      showNotification("error", "Failed to upload image.");
+      showNotification("error", error.message || "Failed to upload image.");
     } finally {
       setUploadingBlockId(null);
       setIsUploadingFeatured(false);
