@@ -8,7 +8,7 @@ import EducationAndSkills from "@/components/EducationAndSkills";
 import Contact from "@/components/Contact";
 import InstagramContent from "@/components/InstagramContent";
 import LinkedInPosts from "@/components/LinkedInPosts";
-import LatestWritings from "@/components/LatestWritings";
+import CaseStudies from "@/components/CaseStudies";
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSeoSettings();
@@ -50,7 +50,7 @@ export default function Home() {
       <Projects />
       <InstagramContent />
       <LinkedInPosts />
-      <LatestWritings />
+      <CaseStudies />
       <Experience />
       <EducationAndSkills />
       <Contact />
