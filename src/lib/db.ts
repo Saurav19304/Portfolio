@@ -1,10 +1,128 @@
 import fs from "fs/promises";
 import path from "path";
+import { Pool } from "pg";
 import { BlogPost } from "./blogUtils";
 
+// --- DATABASE CONNECTION MANAGER ---
+let pool: Pool | null = null;
+let isInitialized = false;
+
+function getPool() {
+  const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  if (!dbUrl) return null;
+  
+  if (!pool) {
+    pool = new Pool({
+      connectionString: dbUrl,
+      ssl: {
+        rejectUnauthorized: false // Required for serverless database connections like Neon
+      }
+    });
+  }
+  return pool;
+}
+
+async function ensureDb() {
+  if (isInitialized) return;
+  const p = getPool();
+  if (!p) return;
+  
+  try {
+    await p.query(`
+      CREATE TABLE IF NOT EXISTS portfolio_data (
+        key VARCHAR(255) PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    isInitialized = true;
+  } catch (error) {
+    console.error("Failed to initialize database table:", error);
+    throw error;
+  }
+}
+
+// Generic helper to get data (with DB fallback to local files)
+async function getData<T>(key: string, localPath: string, defaultValue: T): Promise<T> {
+  const p = getPool();
+  if (p) {
+    try {
+      await ensureDb();
+      const res = await p.query("SELECT value FROM portfolio_data WHERE key = $1", [key]);
+      if (res.rows.length > 0) {
+        return JSON.parse(res.rows[0].value) as T;
+      } else {
+        // Seed database with local JSON file contents on the first run
+        let localDataStr = "";
+        try {
+          localDataStr = await fs.readFile(localPath, "utf8");
+        } catch {
+          localDataStr = JSON.stringify(defaultValue);
+        }
+        const val = JSON.parse(localDataStr) as T;
+        await p.query(
+          "INSERT INTO portfolio_data (key, value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()",
+          [key, JSON.stringify(val)]
+        );
+        return val;
+      }
+    } catch (dbError) {
+      console.error(`Database read error for key "${key}", falling back to local file:`, dbError);
+    }
+  }
+
+  // Fallback to local files (development / localhost)
+  try {
+    const data = await fs.readFile(localPath, "utf8");
+    return JSON.parse(data) as T;
+  } catch (error) {
+    console.error(`Local file read error for key "${key}", returning default:`, error);
+    return defaultValue;
+  }
+}
+
+// Generic helper to save data
+async function saveData<T>(key: string, localPath: string, val: T): Promise<boolean> {
+  const p = getPool();
+  if (p) {
+    try {
+      await ensureDb();
+      await p.query(
+        "INSERT INTO portfolio_data (key, value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()",
+        [key, JSON.stringify(val)]
+      );
+      // Optional local backup write (will fail silently in read-only environments like Vercel)
+      try {
+        await fs.writeFile(localPath, JSON.stringify(val, null, 2), "utf8");
+      } catch {
+        // Ignore read-only filesystem errors in production
+      }
+      return true;
+    } catch (dbError) {
+      console.error(`Database write error for key "${key}":`, dbError);
+      return false;
+    }
+  }
+
+  // Fallback to local files (development / localhost)
+  try {
+    await fs.writeFile(localPath, JSON.stringify(val, null, 2), "utf8");
+    return true;
+  } catch (error) {
+    console.error(`Local file write error for key "${key}":`, error);
+    return false;
+  }
+}
+
+// --- FILE PATH CONFIGURATIONS ---
 const dbFilePath = path.join(process.cwd(), "src/data/posts.db.json");
 const seoFilePath = path.join(process.cwd(), "src/data/seo.db.json");
+const profileFilePath = path.join(process.cwd(), "src/data/profile.db.json");
+const caseStudiesFilePath = path.join(process.cwd(), "src/data/caseStudies.db.json");
+const instagramFilePath = path.join(process.cwd(), "src/data/instagram.db.json");
+const linkedinFilePath = path.join(process.cwd(), "src/data/linkedin.db.json");
 
+// --- INTERFACES & TYPES ---
 export interface PageSeoConfig {
   title: string;
   description: string;
@@ -27,152 +145,6 @@ export interface SeoSettings {
   blog: PageSeoConfig;
   general: GeneralSeoConfig;
 }
-
-// Helper to read SEO database
-export async function getSeoSettings(): Promise<SeoSettings> {
-  try {
-    const data = await fs.readFile(seoFilePath, "utf8");
-    return JSON.parse(data) as SeoSettings;
-  } catch (error) {
-    console.error("SEO database read error, returning default settings:", error);
-    return {
-      home: {
-        title: "Saurav Vaghela | Digital Marketing & SEO Specialist",
-        description: "Portfolio of Saurav Vaghela, a Digital Marketing and SEO professional specializing in keyword research, technical SEO, and data-driven strategies.",
-        keywords: "Saurav Vaghela, Digital Marketing Specialist, SEO Specialist, Technical SEO, Keyword Research, SEO Consultant, Data-Driven Marketing Specialist",
-        robots: "index, follow",
-        canonical: "https://saurav.digital/",
-        ogTitle: "Saurav Vaghela | Digital Marketing & SEO Specialist",
-        ogDescription: "Portfolio of Saurav Vaghela, a Digital Marketing and SEO professional specializing in keyword research, technical SEO, and data-driven strategies.",
-        ogImage: "/og-image.png"
-      },
-      blog: {
-        title: "Writings & Insights | Saurav Vaghela",
-        description: "Data-driven strategies, technical SEO tutorials, keyword research principles, and updates from my digital marketing journey.",
-        keywords: "SEO, Content Marketing, WordPress, Next.js, Technical SEO",
-        robots: "index, follow",
-        canonical: "https://saurav.digital/blog",
-        ogTitle: "Writings & Insights | Saurav Vaghela",
-        ogDescription: "Data-driven strategies, technical SEO tutorials, keyword research principles, and updates from my digital marketing journey.",
-        ogImage: "/og-image.png"
-      },
-      general: {
-        googleAnalyticsId: "G-ZXXGPSHTHY",
-        googleSiteVerification: "",
-        schemaMarkup: "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Person\",\n  \"name\": \"Saurav Vaghela\",\n  \"url\": \"https://saurav.digital\",\n  \"jobTitle\": \"Digital Marketing & SEO Specialist\"\n}"
-      }
-    };
-  }
-}
-
-// Helper to save SEO database
-export async function saveSeoSettings(settings: SeoSettings): Promise<boolean> {
-  try {
-    await fs.writeFile(seoFilePath, JSON.stringify(settings, null, 2), "utf8");
-    return true;
-  } catch (error) {
-    console.error("SEO database write error:", error);
-    return false;
-  }
-}
-
-// Helper to read database
-export async function getPosts(): Promise<BlogPost[]> {
-  try {
-    const data = await fs.readFile(dbFilePath, "utf8");
-    return JSON.parse(data) as BlogPost[];
-  } catch (error) {
-    console.error("Database read error, returning empty array:", error);
-    return [];
-  }
-}
-
-// Helper to save posts array
-export async function savePosts(posts: BlogPost[]): Promise<boolean> {
-  try {
-    await fs.writeFile(dbFilePath, JSON.stringify(posts, null, 2), "utf8");
-    return true;
-  } catch (error) {
-    console.error("Database write error:", error);
-    return false;
-  }
-}
-
-// Get post by slug
-export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-  const posts = await getPosts();
-  return posts.find((p) => p.slug === slug) || null;
-}
-
-// Increment post views dynamically
-export async function incrementPostViews(slug: string): Promise<number | null> {
-  const posts = await getPosts();
-  const index = posts.findIndex((p) => p.slug === slug);
-  if (index === -1) return null;
-
-  posts[index].views += 1;
-  const success = await savePosts(posts);
-  return success ? posts[index].views : null;
-}
-
-// Create or update a post
-export async function savePost(postData: Partial<BlogPost> & { slug: string; title: string }): Promise<BlogPost | null> {
-  const posts = await getPosts();
-  const index = posts.findIndex((p) => p.slug === postData.slug);
-
-  const now = new Date().toISOString();
-
-  if (index !== -1) {
-    // Update existing post
-    const existing = posts[index];
-    const updated: BlogPost = {
-      ...existing,
-      ...postData,
-      updatedAt: now,
-    } as BlogPost;
-    
-    posts[index] = updated;
-    const success = await savePosts(posts);
-    return success ? updated : null;
-  } else {
-    // Create new post
-    const newId = posts.length > 0 ? (Math.max(...posts.map(p => parseInt(p.id) || 0)) + 1).toString() : "1";
-    const newPost: BlogPost = {
-      id: newId,
-      views: 0,
-      status: "draft",
-      featured: false,
-      publishedAt: now,
-      updatedAt: now,
-      excerpt: postData.excerpt || "",
-      content: postData.content || "",
-      featuredImage: postData.featuredImage || "",
-      category: postData.category || "General",
-      tags: postData.tags || [],
-      metaTitle: postData.metaTitle || `${postData.title} | Saurav Vaghela`,
-      metaDescription: postData.metaDescription || postData.excerpt || "",
-      focusKeyword: postData.focusKeyword || "",
-      author: postData.author || "Saurav Vaghela",
-      ...postData,
-    } as BlogPost;
-
-    posts.push(newPost);
-    const success = await savePosts(posts);
-    return success ? newPost : null;
-  }
-}
-
-// Delete post
-export async function deletePost(slug: string): Promise<boolean> {
-  const posts = await getPosts();
-  const filtered = posts.filter((p) => p.slug !== slug);
-  if (posts.length === filtered.length) return false;
-
-  return await savePosts(filtered);
-}
-
-// --- PROFILE MANAGER HELPERS ---
-const profileFilePath = path.join(process.cwd(), "src/data/profile.db.json");
 
 export interface ProfileData {
   about: {
@@ -200,29 +172,6 @@ export interface ProfileData {
   };
 }
 
-export async function getProfile(): Promise<ProfileData> {
-  try {
-    const data = await fs.readFile(profileFilePath, "utf8");
-    return JSON.parse(data) as ProfileData;
-  } catch (error) {
-    console.error("Profile db read error:", error);
-    throw error;
-  }
-}
-
-export async function saveProfile(profile: ProfileData): Promise<boolean> {
-  try {
-    await fs.writeFile(profileFilePath, JSON.stringify(profile, null, 2), "utf8");
-    return true;
-  } catch (error) {
-    console.error("Profile db write error:", error);
-    return false;
-  }
-}
-
-// --- CASE STUDIES HELPERS ---
-const caseStudiesFilePath = path.join(process.cwd(), "src/data/caseStudies.db.json");
-
 export interface CaseStudyData {
   id: string;
   title: string;
@@ -237,24 +186,155 @@ export interface CaseStudyData {
   results: string[];
 }
 
-export async function getCaseStudies(): Promise<CaseStudyData[]> {
-  try {
-    const data = await fs.readFile(caseStudiesFilePath, "utf8");
-    return JSON.parse(data) as CaseStudyData[];
-  } catch (error) {
-    console.error("Case studies read error:", error);
-    return [];
+export interface InstagramPostData {
+  id: number;
+  title: string;
+  link: string;
+  mediaSrc: string;
+  type: "image" | "video";
+}
+
+export interface LinkedInPostData {
+  id: number;
+  title: string;
+  description: string;
+  link: string;
+}
+
+// --- SEO CONFIG HELPERS ---
+export async function getSeoSettings(): Promise<SeoSettings> {
+  const defaultSettings: SeoSettings = {
+    home: {
+      title: "Saurav Vaghela | Digital Marketing & SEO Specialist",
+      description: "Portfolio of Saurav Vaghela, a Digital Marketing and SEO professional specializing in keyword research, technical SEO, and data-driven strategies.",
+      keywords: "Saurav Vaghela, Digital Marketing Specialist, SEO Specialist, Technical SEO, Keyword Research, SEO Consultant, Data-Driven Marketing Specialist",
+      robots: "index, follow",
+      canonical: "https://saurav.digital/",
+      ogTitle: "Saurav Vaghela | Digital Marketing & SEO Specialist",
+      ogDescription: "Portfolio of Saurav Vaghela, a Digital Marketing and SEO professional specializing in keyword research, technical SEO, and data-driven strategies.",
+      ogImage: "/og-image.png"
+    },
+    blog: {
+      title: "Writings & Insights | Saurav Vaghela",
+      description: "Data-driven strategies, technical SEO tutorials, keyword research principles, and updates from my digital marketing journey.",
+      keywords: "SEO, Content Marketing, WordPress, Next.js, Technical SEO",
+      robots: "index, follow",
+      canonical: "https://saurav.digital/blog",
+      ogTitle: "Writings & Insights | Saurav Vaghela",
+      ogDescription: "Data-driven strategies, technical SEO tutorials, keyword research principles, and updates from my digital marketing journey.",
+      ogImage: "/og-image.png"
+    },
+    general: {
+      googleAnalyticsId: "G-ZXXGPSHTHY",
+      googleSiteVerification: "",
+      schemaMarkup: "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Person\",\n  \"name\": \"Saurav Vaghela\",\n  \"url\": \"https://saurav.digital\",\n  \"jobTitle\": \"Digital Marketing & SEO Specialist\"\n}"
+    }
+  };
+  return getData<SeoSettings>("seo", seoFilePath, defaultSettings);
+}
+
+export async function saveSeoSettings(settings: SeoSettings): Promise<boolean> {
+  return saveData<SeoSettings>("seo", seoFilePath, settings);
+}
+
+// --- BLOG POSTS HELPERS ---
+export async function getPosts(): Promise<BlogPost[]> {
+  return getData<BlogPost[]>("posts", dbFilePath, []);
+}
+
+export async function savePosts(posts: BlogPost[]): Promise<boolean> {
+  return saveData<BlogPost[]>("posts", dbFilePath, posts);
+}
+
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  const posts = await getPosts();
+  return posts.find((p) => p.slug === slug) || null;
+}
+
+export async function incrementPostViews(slug: string): Promise<number | null> {
+  const posts = await getPosts();
+  const index = posts.findIndex((p) => p.slug === slug);
+  if (index === -1) return null;
+
+  posts[index].views += 1;
+  const success = await savePosts(posts);
+  return success ? posts[index].views : null;
+}
+
+export async function savePost(postData: Partial<BlogPost> & { slug: string; title: string }): Promise<BlogPost | null> {
+  const posts = await getPosts();
+  const index = posts.findIndex((p) => p.slug === postData.slug);
+  const now = new Date().toISOString();
+
+  if (index !== -1) {
+    const existing = posts[index];
+    const updated: BlogPost = {
+      ...existing,
+      ...postData,
+      updatedAt: now,
+    } as BlogPost;
+    
+    posts[index] = updated;
+    const success = await savePosts(posts);
+    return success ? updated : null;
+  } else {
+    const newId = posts.length > 0 ? (Math.max(...posts.map(p => parseInt(p.id) || 0)) + 1).toString() : "1";
+    const newPost: BlogPost = {
+      id: newId,
+      views: 0,
+      status: "draft",
+      featured: false,
+      publishedAt: now,
+      updatedAt: now,
+      excerpt: postData.excerpt || "",
+      content: postData.content || "",
+      featuredImage: postData.featuredImage || "",
+      category: postData.category || "General",
+      tags: postData.tags || [],
+      metaTitle: postData.metaTitle || `${postData.title} | Saurav Vaghela`,
+      metaDescription: postData.metaDescription || postData.excerpt || "",
+      focusKeyword: postData.focusKeyword || "",
+      author: postData.author || "Saurav Vaghela",
+      ...postData,
+    } as BlogPost;
+
+    posts.push(newPost);
+    const success = await savePosts(posts);
+    return success ? newPost : null;
   }
 }
 
+export async function deletePost(slug: string): Promise<boolean> {
+  const posts = await getPosts();
+  const filtered = posts.filter((p) => p.slug !== slug);
+  if (posts.length === filtered.length) return false;
+  return await savePosts(filtered);
+}
+
+// --- PROFILE HELPERS ---
+export async function getProfile(): Promise<ProfileData> {
+  const defaultProfile: ProfileData = {
+    about: { text: "" },
+    education: [],
+    certifications: [],
+    skills: [],
+    tools: [],
+    contact: { email: "", phone: "", linkedinUrl: "", linkedinName: "", location: "" }
+  };
+  return getData<ProfileData>("profile", profileFilePath, defaultProfile);
+}
+
+export async function saveProfile(profile: ProfileData): Promise<boolean> {
+  return saveData<ProfileData>("profile", profileFilePath, profile);
+}
+
+// --- CASE STUDIES HELPERS ---
+export async function getCaseStudies(): Promise<CaseStudyData[]> {
+  return getData<CaseStudyData[]>("caseStudies", caseStudiesFilePath, []);
+}
+
 export async function saveCaseStudies(caseStudies: CaseStudyData[]): Promise<boolean> {
-  try {
-    await fs.writeFile(caseStudiesFilePath, JSON.stringify(caseStudies, null, 2), "utf8");
-    return true;
-  } catch (error) {
-    console.error("Case studies write error:", error);
-    return false;
-  }
+  return saveData<CaseStudyData[]>("caseStudies", caseStudiesFilePath, caseStudies);
 }
 
 export async function saveCaseStudy(csData: Partial<CaseStudyData> & { id: string }): Promise<CaseStudyData | null> {
@@ -293,35 +373,13 @@ export async function deleteCaseStudy(id: string): Promise<boolean> {
   return await saveCaseStudies(filtered);
 }
 
-// --- INSTAGRAM POSTS HELPERS ---
-const instagramFilePath = path.join(process.cwd(), "src/data/instagram.db.json");
-
-export interface InstagramPostData {
-  id: number;
-  title: string;
-  link: string;
-  mediaSrc: string;
-  type: "image" | "video";
-}
-
+// --- INSTAGRAM HELPERS ---
 export async function getInstagramPosts(): Promise<InstagramPostData[]> {
-  try {
-    const data = await fs.readFile(instagramFilePath, "utf8");
-    return JSON.parse(data) as InstagramPostData[];
-  } catch (error) {
-    console.error("Instagram posts read error:", error);
-    return [];
-  }
+  return getData<InstagramPostData[]>("instagram", instagramFilePath, []);
 }
 
 export async function saveInstagramPosts(posts: InstagramPostData[]): Promise<boolean> {
-  try {
-    await fs.writeFile(instagramFilePath, JSON.stringify(posts, null, 2), "utf8");
-    return true;
-  } catch (error) {
-    console.error("Instagram posts write error:", error);
-    return false;
-  }
+  return saveData<InstagramPostData[]>("instagram", instagramFilePath, posts);
 }
 
 export async function saveInstagramPost(postData: Partial<InstagramPostData> & { id: number }): Promise<InstagramPostData | null> {
@@ -354,34 +412,13 @@ export async function deleteInstagramPost(id: number): Promise<boolean> {
   return await saveInstagramPosts(filtered);
 }
 
-// --- LINKEDIN POSTS HELPERS ---
-const linkedinFilePath = path.join(process.cwd(), "src/data/linkedin.db.json");
-
-export interface LinkedInPostData {
-  id: number;
-  title: string;
-  description: string;
-  link: string;
-}
-
+// --- LINKEDIN HELPERS ---
 export async function getLinkedInPosts(): Promise<LinkedInPostData[]> {
-  try {
-    const data = await fs.readFile(linkedinFilePath, "utf8");
-    return JSON.parse(data) as LinkedInPostData[];
-  } catch (error) {
-    console.error("LinkedIn posts read error:", error);
-    return [];
-  }
+  return getData<LinkedInPostData[]>("linkedin", linkedinFilePath, []);
 }
 
 export async function saveLinkedInPosts(posts: LinkedInPostData[]): Promise<boolean> {
-  try {
-    await fs.writeFile(linkedinFilePath, JSON.stringify(posts, null, 2), "utf8");
-    return true;
-  } catch (error) {
-    console.error("LinkedIn posts write error:", error);
-    return false;
-  }
+  return saveData<LinkedInPostData[]>("linkedin", linkedinFilePath, posts);
 }
 
 export async function saveLinkedInPost(postData: Partial<LinkedInPostData> & { id: number }): Promise<LinkedInPostData | null> {
@@ -412,4 +449,3 @@ export async function deleteLinkedInPost(id: number): Promise<boolean> {
   if (list.length === filtered.length) return false;
   return await saveLinkedInPosts(filtered);
 }
-
