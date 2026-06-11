@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "title": "Sips and Special",
+    "link": "https://www.instagram.com/p/DKO7ZdVomEB/",
+    "mediaSrc": "/sips-and-specials.jpg",
+    "type": "image"
+  },
+  {
+    "id": 2,
+    "title": "Pasta Special",
+    "link": "https://www.instagram.com/p/DKO7ZdVomEB/",
+    "mediaSrc": "/pasta-special.jpg",
+    "type": "image"
+  },
+  {
+    "id": 3,
+    "title": "Video Editing",
+    "link": "https://www.instagram.com/reel/DP4MjtmDKBO/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==",
+    "mediaSrc": "/get.mp4",
+    "type": "video"
+  },
+  {
+    "id": 4,
+    "title": "Cinematic Video",
+    "link": "https://www.instagram.com/reel/DVeYj_ADPly/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==",
+    "mediaSrc": "/insta-video.mp4",
+    "type": "video"
+  }
+]

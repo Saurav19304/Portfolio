@@ -1,0 +1,73 @@
+{
+  "about": {
+    "text": "I am a Digital Marketing and SEO professional with hands-on experience in keyword research, on-page SEO, technical SEO, and content optimization. I focus on leveraging data-driven strategies to enhance website visibility, improve search rankings, and drive sustainable organic traffic growth. I am passionate about helping businesses strengthen their online presence and achieve measurable results through effective digital marketing strategies."
+  },
+  "education": [
+    {
+      "degree": "MA Digital Marketing",
+      "institution": "University of Portsmouth",
+      "period": "2026 – 2027"
+    },
+    {
+      "degree": "Bachelor of Commerce",
+      "institution": "Gujarat University",
+      "period": "2021 – 2024"
+    }
+  ],
+  "certifications": [
+    {
+      "title": "Digital Skills: Digital Marketing",
+      "issuer": "Accenture (via FutureLearn)",
+      "period": "2026",
+      "details": "Completed Accenture's certified course focusing on Search Engine Optimisation (SEO), Pay-Per-Click (PPC), Display Advertising, Email Marketing, Customer Targeting, and Strategy Integration."
+    },
+    {
+      "title": "Digital Marketing Certification",
+      "issuer": "Digital Azadi",
+      "period": "2024",
+      "details": "SEO strategies, Content marketing, Social media marketing, Digital campaign management"
+    },
+    {
+      "title": "Microsoft Certification",
+      "issuer": "LinkedIn Learning",
+      "period": "2024",
+      "details": "Completed Microsoft certification course focusing on digital tools, productivity, and professional development."
+    },
+    {
+      "title": "Data Analytics Certification",
+      "issuer": "Tops Technology",
+      "period": "2023 – 2024",
+      "details": "Data Visualization, Statistical Analysis, Dashboard Creation, Business Data Insights"
+    }
+  ],
+  "skills": [
+    "Digital Marketing",
+    "On Page SEO",
+    "Off Page SEO",
+    "Technical SEO",
+    "Keyword Research",
+    "Content Marketing",
+    "WordPress",
+    "Canva",
+    "Microsoft Excel",
+    "Power BI",
+    "Google Search Console",
+    "Data Visualization",
+    "Content Creation",
+    "Website Optimization"
+  ],
+  "tools": [
+    "Google Analytics",
+    "Google Search Console",
+    "Ahrefs",
+    "SEMrush",
+    "Meta Business Suite"
+  ],
+  "contact": {
+    "email": "sauravvaghela22@gmail.com",
+    "phone": "+44 7352697112",
+    "linkedinUrl": "https://www.linkedin.com/in/sauravvaghela19/",
+    "linkedinName": "Saurav Vaghela",
+    "location": "Southampton, UK"
+  }
+}

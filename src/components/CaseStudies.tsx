@@ -17,7 +17,7 @@ interface CaseStudy {
   results: string[];
 }
 
-const CASE_STUDIES: CaseStudy[] = [
+const DEFAULT_CASE_STUDIES: CaseStudy[] = [
   {
     id: "mary-rose-museum",
     title: "Revitalizing Engagement & Visitor Plan for a Tudor National Treasure",
@@ -67,9 +67,30 @@ const CASE_STUDIES: CaseStudy[] = [
 ];
 
 export default function CaseStudies() {
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(DEFAULT_CASE_STUDIES);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const selectedStudy = CASE_STUDIES.find((cs) => cs.id === selectedId);
+  useEffect(() => {
+    async function loadCaseStudies() {
+      try {
+        const res = await fetch("/api/case-studies");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setCaseStudies(data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch case studies:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadCaseStudies();
+  }, []);
+
+  const selectedStudy = caseStudies.find((cs) => cs.id === selectedId);
 
   // Lock scroll when modal is open
   useEffect(() => {
@@ -82,6 +103,20 @@ export default function CaseStudies() {
       document.body.style.overflow = "";
     };
   }, [selectedId]);
+
+  if (isLoading) {
+    return (
+      <section id="case-studies" className="relative z-20 bg-[#121212] py-32 px-6 lg:px-12 text-white border-t border-white/5">
+        <div className="max-w-7xl mx-auto animate-pulse">
+          <div className="h-10 bg-white/5 rounded w-1/4 mb-10" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="h-[450px] bg-white/5 rounded-3xl" />
+            <div className="h-[450px] bg-white/5 rounded-3xl" />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="case-studies" className="relative z-20 bg-[#121212] py-32 px-6 lg:px-12 text-white border-t border-white/5">
@@ -96,7 +131,7 @@ export default function CaseStudies() {
 
         {/* Case Studies Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {CASE_STUDIES.map((study, idx) => (
+          {caseStudies.map((study, idx) => (
             <motion.div
               key={study.id}
               initial={{ opacity: 0, y: 40 }}

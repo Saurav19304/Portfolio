@@ -1,8 +1,16 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const LINKEDIN_POSTS = [
+interface LinkedInPost {
+  id: number;
+  title: string;
+  description: string;
+  link: string;
+}
+
+const DEFAULT_LINKEDIN_POSTS: LinkedInPost[] = [
   {
     id: 5,
     title: "Project Mary Rose Presentation",
@@ -36,6 +44,42 @@ const LINKEDIN_POSTS = [
 ];
 
 export default function LinkedInPosts() {
+  const [posts, setPosts] = useState<LinkedInPost[]>(DEFAULT_LINKEDIN_POSTS);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        const res = await fetch("/api/linkedin");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setPosts(data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load LinkedIn posts:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadPosts();
+  }, []);
+
+  if (isLoading && posts.length === 0) {
+    return (
+      <section className="relative z-20 bg-[#121212] py-32 px-6 lg:px-12 text-white border-t border-white/5 animate-pulse">
+        <div className="max-w-7xl mx-auto">
+          <div className="h-10 bg-white/5 rounded w-1/4 mb-10" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="h-48 bg-white/5 rounded-3xl" />
+            <div className="h-48 bg-white/5 rounded-3xl" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative z-20 bg-[#121212] py-32 px-6 lg:px-12 text-white border-t border-white/5">
       <div className="max-w-7xl mx-auto">
@@ -47,7 +91,7 @@ export default function LinkedInPosts() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {LINKEDIN_POSTS.map((post, idx) => (
+          {posts.map((post, idx) => (
             <motion.div
               key={post.id}
               initial={{ opacity: 0, y: 30 }}

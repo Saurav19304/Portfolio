@@ -171,3 +171,245 @@ export async function deletePost(slug: string): Promise<boolean> {
   return await savePosts(filtered);
 }
 
+// --- PROFILE MANAGER HELPERS ---
+const profileFilePath = path.join(process.cwd(), "src/data/profile.db.json");
+
+export interface ProfileData {
+  about: {
+    text: string;
+  };
+  education: Array<{
+    degree: string;
+    institution: string;
+    period: string;
+  }>;
+  certifications: Array<{
+    title: string;
+    issuer: string;
+    period: string;
+    details: string;
+  }>;
+  skills: string[];
+  tools: string[];
+  contact: {
+    email: string;
+    phone: string;
+    linkedinUrl: string;
+    linkedinName: string;
+    location: string;
+  };
+}
+
+export async function getProfile(): Promise<ProfileData> {
+  try {
+    const data = await fs.readFile(profileFilePath, "utf8");
+    return JSON.parse(data) as ProfileData;
+  } catch (error) {
+    console.error("Profile db read error:", error);
+    throw error;
+  }
+}
+
+export async function saveProfile(profile: ProfileData): Promise<boolean> {
+  try {
+    await fs.writeFile(profileFilePath, JSON.stringify(profile, null, 2), "utf8");
+    return true;
+  } catch (error) {
+    console.error("Profile db write error:", error);
+    return false;
+  }
+}
+
+// --- CASE STUDIES HELPERS ---
+const caseStudiesFilePath = path.join(process.cwd(), "src/data/caseStudies.db.json");
+
+export interface CaseStudyData {
+  id: string;
+  title: string;
+  client: string;
+  category: string;
+  shortDescription: string;
+  metricValue: string;
+  metricLabel: string;
+  challenge: string;
+  strategy: string;
+  execution: string[];
+  results: string[];
+}
+
+export async function getCaseStudies(): Promise<CaseStudyData[]> {
+  try {
+    const data = await fs.readFile(caseStudiesFilePath, "utf8");
+    return JSON.parse(data) as CaseStudyData[];
+  } catch (error) {
+    console.error("Case studies read error:", error);
+    return [];
+  }
+}
+
+export async function saveCaseStudies(caseStudies: CaseStudyData[]): Promise<boolean> {
+  try {
+    await fs.writeFile(caseStudiesFilePath, JSON.stringify(caseStudies, null, 2), "utf8");
+    return true;
+  } catch (error) {
+    console.error("Case studies write error:", error);
+    return false;
+  }
+}
+
+export async function saveCaseStudy(csData: Partial<CaseStudyData> & { id: string }): Promise<CaseStudyData | null> {
+  const list = await getCaseStudies();
+  const index = list.findIndex((c) => c.id === csData.id);
+
+  if (index !== -1) {
+    const updated = { ...list[index], ...csData } as CaseStudyData;
+    list[index] = updated;
+    const success = await saveCaseStudies(list);
+    return success ? updated : null;
+  } else {
+    const newCs = {
+      title: "",
+      client: "",
+      category: "",
+      shortDescription: "",
+      metricValue: "",
+      metricLabel: "",
+      challenge: "",
+      strategy: "",
+      execution: [],
+      results: [],
+      ...csData
+    } as CaseStudyData;
+    list.push(newCs);
+    const success = await saveCaseStudies(list);
+    return success ? newCs : null;
+  }
+}
+
+export async function deleteCaseStudy(id: string): Promise<boolean> {
+  const list = await getCaseStudies();
+  const filtered = list.filter((c) => c.id !== id);
+  if (list.length === filtered.length) return false;
+  return await saveCaseStudies(filtered);
+}
+
+// --- INSTAGRAM POSTS HELPERS ---
+const instagramFilePath = path.join(process.cwd(), "src/data/instagram.db.json");
+
+export interface InstagramPostData {
+  id: number;
+  title: string;
+  link: string;
+  mediaSrc: string;
+  type: "image" | "video";
+}
+
+export async function getInstagramPosts(): Promise<InstagramPostData[]> {
+  try {
+    const data = await fs.readFile(instagramFilePath, "utf8");
+    return JSON.parse(data) as InstagramPostData[];
+  } catch (error) {
+    console.error("Instagram posts read error:", error);
+    return [];
+  }
+}
+
+export async function saveInstagramPosts(posts: InstagramPostData[]): Promise<boolean> {
+  try {
+    await fs.writeFile(instagramFilePath, JSON.stringify(posts, null, 2), "utf8");
+    return true;
+  } catch (error) {
+    console.error("Instagram posts write error:", error);
+    return false;
+  }
+}
+
+export async function saveInstagramPost(postData: Partial<InstagramPostData> & { id: number }): Promise<InstagramPostData | null> {
+  const list = await getInstagramPosts();
+  const index = list.findIndex((p) => p.id === postData.id);
+
+  if (index !== -1) {
+    const updated = { ...list[index], ...postData } as InstagramPostData;
+    list[index] = updated;
+    const success = await saveInstagramPosts(list);
+    return success ? updated : null;
+  } else {
+    const newPost = {
+      title: "",
+      link: "",
+      mediaSrc: "",
+      type: "image",
+      ...postData
+    } as InstagramPostData;
+    list.push(newPost);
+    const success = await saveInstagramPosts(list);
+    return success ? newPost : null;
+  }
+}
+
+export async function deleteInstagramPost(id: number): Promise<boolean> {
+  const list = await getInstagramPosts();
+  const filtered = list.filter((p) => p.id !== id);
+  if (list.length === filtered.length) return false;
+  return await saveInstagramPosts(filtered);
+}
+
+// --- LINKEDIN POSTS HELPERS ---
+const linkedinFilePath = path.join(process.cwd(), "src/data/linkedin.db.json");
+
+export interface LinkedInPostData {
+  id: number;
+  title: string;
+  description: string;
+  link: string;
+}
+
+export async function getLinkedInPosts(): Promise<LinkedInPostData[]> {
+  try {
+    const data = await fs.readFile(linkedinFilePath, "utf8");
+    return JSON.parse(data) as LinkedInPostData[];
+  } catch (error) {
+    console.error("LinkedIn posts read error:", error);
+    return [];
+  }
+}
+
+export async function saveLinkedInPosts(posts: LinkedInPostData[]): Promise<boolean> {
+  try {
+    await fs.writeFile(linkedinFilePath, JSON.stringify(posts, null, 2), "utf8");
+    return true;
+  } catch (error) {
+    console.error("LinkedIn posts write error:", error);
+    return false;
+  }
+}
+
+export async function saveLinkedInPost(postData: Partial<LinkedInPostData> & { id: number }): Promise<LinkedInPostData | null> {
+  const list = await getLinkedInPosts();
+  const index = list.findIndex((p) => p.id === postData.id);
+
+  if (index !== -1) {
+    const updated = { ...list[index], ...postData } as LinkedInPostData;
+    list[index] = updated;
+    const success = await saveLinkedInPosts(list);
+    return success ? updated : null;
+  } else {
+    const newPost = {
+      title: "",
+      description: "",
+      link: "",
+      ...postData
+    } as LinkedInPostData;
+    list.push(newPost);
+    const success = await saveLinkedInPosts(list);
+    return success ? newPost : null;
+  }
+}
+
+export async function deleteLinkedInPost(id: number): Promise<boolean> {
+  const list = await getLinkedInPosts();
+  const filtered = list.filter((p) => p.id !== id);
+  if (list.length === filtered.length) return false;
+  return await saveLinkedInPosts(filtered);
+}
+

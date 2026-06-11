@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 type MediaType = "image" | "video";
@@ -13,7 +13,7 @@ interface InstagramPost {
   type: MediaType;
 }
 
-const INSTAGRAM_POSTS: InstagramPost[] = [
+const DEFAULT_INSTAGRAM_POSTS: InstagramPost[] = [
   {
     id: 1,
     title: "Sips and Special",
@@ -45,10 +45,42 @@ const INSTAGRAM_POSTS: InstagramPost[] = [
 ];
 
 export default function InstagramContent() {
+  const [posts, setPosts] = useState<InstagramPost[]>(DEFAULT_INSTAGRAM_POSTS);
+  const [isLoading, setIsLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
 
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        const res = await fetch("/api/instagram");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setPosts(data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load Instagram posts:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadPosts();
+  }, []);
+
   // Duplicate the array exactly once so that when we translate -50%, it seamlessly loops
-  const allPosts = [...INSTAGRAM_POSTS, ...INSTAGRAM_POSTS];
+  const allPosts = [...posts, ...posts];
+
+  if (isLoading && posts.length === 0) {
+    return (
+      <section className="relative z-20 bg-[#121212] py-32 overflow-hidden text-white border-t border-white/5 animate-pulse">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 mb-16">
+          <div className="h-10 bg-white/5 rounded w-1/4 mb-4" />
+          <div className="h-6 bg-white/5 rounded w-1/3" />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative z-20 bg-[#121212] py-32 overflow-hidden text-white border-t border-white/5">

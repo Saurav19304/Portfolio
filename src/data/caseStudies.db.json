@@ -1,0 +1,48 @@
+[
+  {
+    "id": "mary-rose-museum",
+    "title": "Revitalizing Engagement & Visitor Plan for a Tudor National Treasure",
+    "client": "Mary Rose Museum (Portsmouth)",
+    "category": "Strategic Marketing Proposal",
+    "shortDescription": "Acting as an agency, we delivered a comprehensive digital marketing implementation plan to modernize visitor acquisition and engage younger demographics.",
+    "metricValue": "Audit & Plan",
+    "metricLabel": "Agency Proposal",
+    "challenge": "The Mary Rose Museum in Portsmouth Historic Dockyard needed a data-driven strategy to boost foot traffic and engage younger local demographics, while strictly preserving its historical authority and educational prestige. As a mock marketing agency, our goal was to outline a detailed strategic roadmap.",
+    "strategy": "Conducted an extensive digital audit of the Portsmouth tourism market. Mapped out target personas (Families, History Buffs, and Tech-Savvy Students) and framed a channel strategy covering local SEO, story-driven social content, and local partnerships.",
+    "execution": [
+      "Audited organic search visibility for Portsmouth historic tourism terms to identify content gaps.",
+      "Developed a target visitor persona framework tailored to local Portsmouth Dockyard visitor demographics.",
+      "Designed a visual, story-driven social content strategy (Instagram & TikTok) to make Tudor history interactive for student markets.",
+      "Proposed experiential recommendations, including augmented reality (AR) overlay tours within physical museum spaces.",
+      "Outlined joint co-promotional pricing partnerships with local Portsmouth universities and hospitality operators."
+    ],
+    "results": [
+      "Delivered a detailed marketing strategy document ready for museum board consideration.",
+      "Provided a tactical 12-month calendar mapping digital campaigns to peak tourism seasons.",
+      "Created repeatable template frameworks for local community integration and student outreach."
+    ]
+  },
+  {
+    "id": "sea-wolf-cleaning",
+    "title": "Low-Budget PPC & Local SEO Lead Generation Blueprint",
+    "client": "Sea Wolf Services",
+    "category": "Local SEO & PPC Strategy",
+    "shortDescription": "Designed a digital marketing plan to capture high-intent cleaning leads under a strict £50 monthly budget constraint.",
+    "metricValue": "£50 Budget",
+    "metricLabel": "Monthly PPC Limit",
+    "challenge": "Sea Wolf Services faced intense competition in Portsmouth from larger, established players (such as Equity Cleaning). The website lacked trust signals (testimonials), had poor call-to-actions, and had to generate B2B cleaning leads with a tight monthly PPC budget of £50.",
+    "strategy": "Formulated a dual-channel strategy. For SEO, targeted a 30% organic traffic increase by optimizing Google Business Profile and local keywords. For PPC, targeted 2–3 B2B leads/month under the £50 cap by scheduling Google Ads strictly during business decision-maker hours (Mon-Fri, 8 AM - 6 PM).",
+    "execution": [
+      "Targeted high-intent local B2B keywords: 'commercial cleaning portsmouth', 'office cleaning portsmouth', and 'contract cleaning portsmouth'.",
+      "Configured Google Ads using Exact & Phrase match with bids aligned to a £2-£4 average CPC range.",
+      "Implemented a strict day-parting schedule (Mon-Fri, 8 AM - 6 PM) to ensure ads only run when office/facilities managers are active.",
+      "Redesigned the landing page structure to inject customer testimonials, Cialdini-inspired social proof, and a simplified quick-quote form.",
+      "Set up Google Analytics & Search Console conversion tracking to measure KPIs (CTR target >3%, Landing Page Conversion >5%)."
+    ],
+    "results": [
+      "Created a phased digital marketing roadmap (SEO on-page, local citations, and bi-weekly PPC adjustments).",
+      "Projected 2-3 qualified leads per month within the strict £50 monthly budget.",
+      "Established long-term growth benchmarks of +30% organic traffic within 6 months."
+    ]
+  }
+]

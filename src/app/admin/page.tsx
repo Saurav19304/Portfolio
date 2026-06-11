@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { BlogPost, getReadTime } from "@/lib/blogUtils";
+import CaseStudiesManager from "@/components/admin/CaseStudiesManager";
+import SocialPostsManager from "@/components/admin/SocialPostsManager";
+import ProfileManager from "@/components/admin/ProfileManager";
 
 type Block =
   | { id: string; type: "heading"; level: 2 | 3; text: string }
@@ -51,7 +54,7 @@ export default function AdminDashboard() {
   const [uploadingBlockId, setUploadingBlockId] = useState<string | null>(null);
 
   // Site-wide SEO Dashboard Mode & States
-  const [dashboardMode, setDashboardMode] = useState<"blog" | "seo">("blog");
+  const [dashboardMode, setDashboardMode] = useState<"blog" | "case" | "social" | "profile" | "seo">("blog");
   const [activeSeoTab, setActiveSeoTab] = useState<"home" | "blog" | "general">("home");
   const [isSavingSeo, setIsSavingSeo] = useState(false);
   const [seoSettings, setSeoSettings] = useState<{
@@ -676,36 +679,42 @@ export default function AdminDashboard() {
               </Link>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-              {dashboardMode === "blog" ? "Blog Editor Dashboard" : "Site-wide SEO Manager"}
+              {dashboardMode === "blog" && "Blog Editor Dashboard"}
+              {dashboardMode === "case" && "Case Studies Manager"}
+              {dashboardMode === "social" && "Social Media Posts"}
+              {dashboardMode === "profile" && "Profile Content Settings"}
+              {dashboardMode === "seo" && "Site-wide SEO Manager"}
             </h1>
             <p className="text-white/50 text-sm mt-1">
-              {dashboardMode === "blog" 
-                ? "Create and manage portfolio articles without writing HTML."
-                : "Manage page meta tags, analytics tracking, verification keys, and custom JSON-LD schema."}
+              {dashboardMode === "blog" && "Create and manage portfolio articles without writing HTML."}
+              {dashboardMode === "case" && "Manage case studies and client projects shown on the homepage."}
+              {dashboardMode === "social" && "Manage Instagram Reels/Images and LinkedIn posts feeds."}
+              {dashboardMode === "profile" && "Manage about text, education, certifications, skills, and contact info."}
+              {dashboardMode === "seo" && "Manage page meta tags, analytics tracking, verification keys, and custom JSON-LD schema."}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Toggle Switcher */}
-            <div className="flex rounded-full overflow-hidden bg-white/5 border border-white/10 p-0.5 mr-2">
-              <button
-                type="button"
-                onClick={() => setDashboardMode("blog")}
-                className={`px-4 py-2 rounded-full text-xs font-bold tracking-wider transition-colors ${
-                  dashboardMode === "blog" ? "bg-white text-black font-extrabold" : "text-white/60 hover:text-white"
-                }`}
-              >
-                Blog Posts
-              </button>
-              <button
-                type="button"
-                onClick={() => setDashboardMode("seo")}
-                className={`px-4 py-2 rounded-full text-xs font-bold tracking-wider transition-colors ${
-                  dashboardMode === "seo" ? "bg-white text-black font-extrabold" : "text-white/60 hover:text-white"
-                }`}
-              >
-                SEO Settings
-              </button>
+            <div className="flex rounded-full overflow-hidden bg-white/5 border border-white/10 p-0.5 mr-2 flex-wrap">
+              {[
+                { id: "blog", label: "Blog" },
+                { id: "case", label: "Case Studies" },
+                { id: "social", label: "Social Feeds" },
+                { id: "profile", label: "Profile Content" },
+                { id: "seo", label: "SEO Config" }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setDashboardMode(tab.id as any)}
+                  className={`px-3 py-2 rounded-full text-[11px] font-bold tracking-wider transition-colors ${
+                    dashboardMode === tab.id ? "bg-white text-black font-extrabold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
             {dashboardMode === "blog" && editingSlug && (
@@ -734,7 +743,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {dashboardMode === "blog" ? (
+        {dashboardMode === "blog" && (
           <>
             {/* Existing Articles Table/Listing */}
             <section className="mb-16 rounded-3xl border border-white/5 bg-white/[0.01] p-6 backdrop-blur-sm">
@@ -1430,7 +1439,21 @@ export default function AdminDashboard() {
 
         </form>
       </>
-    ) : (
+    )}
+
+    {dashboardMode === "case" && (
+      <CaseStudiesManager showNotification={showNotification} />
+    )}
+
+    {dashboardMode === "social" && (
+      <SocialPostsManager showNotification={showNotification} />
+    )}
+
+    {dashboardMode === "profile" && (
+      <ProfileManager showNotification={showNotification} />
+    )}
+
+    {dashboardMode === "seo" && (
       <form onSubmit={handleSaveSeo} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Area (2 Columns) */}
         <div className="lg:col-span-2 space-y-8">
