@@ -20,48 +20,48 @@ interface CaseStudy {
 const CASE_STUDIES: CaseStudy[] = [
   {
     id: "mary-rose-museum",
-    title: "Revitalizing Foot Traffic & Engagement for a National Treasure",
+    title: "Revitalizing Engagement & Visitor Plan for a Tudor National Treasure",
     client: "Mary Rose Museum (Portsmouth)",
-    category: "Marketing Agency Strategy",
-    shortDescription: "A comprehensive digital marketing audit and agency campaign proposal designed to modernize visitor acquisition and engage younger demographics.",
-    metricValue: "3 Personas",
-    metricLabel: "Strategic Target Audiences",
-    challenge: "The Mary Rose Museum, housing Henry VIII's historic Tudor warship, needed to expand its appeal to younger demographics and Portsmouth locals without compromising its educational prestige and historical authority.",
-    strategy: "Conducted an in-depth digital audit of the Portsmouth Historic Dockyard ecosystem. Structured a multi-channel campaign around three core target personas: local families seeking experiential weekends, history enthusiasts looking for deep content, and tech-savvy students.",
+    category: "Strategic Marketing Proposal",
+    shortDescription: "Acting as an agency, we delivered a comprehensive digital marketing implementation plan to modernize visitor acquisition and engage younger demographics.",
+    metricValue: "Audit & Plan",
+    metricLabel: "Agency Proposal",
+    challenge: "The Mary Rose Museum in Portsmouth Historic Dockyard needed a data-driven strategy to boost foot traffic and engage younger local demographics, while strictly preserving its historical authority and educational prestige. As a mock marketing agency, our goal was to outline a detailed strategic roadmap.",
+    strategy: "Conducted an extensive digital audit of the Portsmouth tourism market. Mapped out target personas (Families, History Buffs, and Tech-Savvy Students) and framed a channel strategy covering local SEO, story-driven social content, and local partnerships.",
     execution: [
-      "Audited local search volume around historic Portsmouth tourism to identify content and intent gaps.",
-      "Designed a social media storytelling framework leveraging interactive, video-first content (Instagram/TikTok) to bring Tudor history to life.",
-      "Proposed augmented reality (AR) overlay recommendations for physical exhibitions to create gamified visitor loops.",
-      "Formulated joint partnership strategies with Portsmouth universities and local hospitality operators for co-promotional pricing.",
-      "Drafted high-intent local SEO content clusters mapping family-friendly weekend itineraries in Portsmouth."
+      "Audited organic search visibility for Portsmouth historic tourism terms to identify content gaps.",
+      "Developed a target visitor persona framework tailored to local Portsmouth Dockyard visitor demographics.",
+      "Designed a visual, story-driven social content strategy (Instagram & TikTok) to make Tudor history interactive for student markets.",
+      "Proposed experiential recommendations, including augmented reality (AR) overlay tours within physical museum spaces.",
+      "Outlined joint co-promotional pricing partnerships with local Portsmouth universities and hospitality operators."
     ],
     results: [
-      "Presented a structured, repeatable agency framework ready for museum marketing board review.",
-      "Detailed 12 months of tactical social media concepts and creative templates.",
-      "Mappped direct channels to increase seasonal bookings through localized digital touchpoints."
+      "Delivered a detailed marketing strategy document ready for museum board consideration.",
+      "Provided a tactical 12-month calendar mapping digital campaigns to peak tourism seasons.",
+      "Created repeatable template frameworks for local community integration and student outreach."
     ]
   },
   {
     id: "sea-wolf-cleaning",
-    title: "Dominating Portsmouth Map Packs & Scaling Local Bookings",
-    client: "Sea Wolf Cleaning Services",
-    category: "Local SEO & Lead Generation",
-    shortDescription: "Implemented a full-scale local SEO blueprint and landing page redesign to drive high-intent commercial and residential cleaning leads.",
-    metricValue: "+140%",
-    metricLabel: "Inbound Lead Volume",
-    challenge: "Sea Wolf Cleaning Services operated in a crowded regional market with virtually zero search footprint, making them highly dependent on word-of-mouth and expensive third-party lead brokers.",
-    strategy: "Built a Local SEO and conversion rate optimization (CRO) system. Focused on capturing high-intent organic traffic (users searching for local cleaning services) and directing them to a friction-free booking flow.",
+    title: "Low-Budget PPC & Local SEO Lead Generation Blueprint",
+    client: "Sea Wolf Services",
+    category: "Local SEO & PPC Strategy",
+    shortDescription: "Designed a digital marketing plan to capture high-intent cleaning leads under a strict £50 monthly budget constraint.",
+    metricValue: "£50 Budget",
+    metricLabel: "Monthly PPC Limit",
+    challenge: "Sea Wolf Services faced intense competition in Portsmouth from larger, established players (such as Equity Cleaning). The website lacked trust signals (testimonials), had poor call-to-actions, and had to generate B2B cleaning leads with a tight monthly PPC budget of £50.",
+    strategy: "Formulated a dual-channel strategy. For SEO, targeted a 30% organic traffic increase by optimizing Google Business Profile and local keywords. For PPC, targeted 2–3 B2B leads/month under the £50 cap by scheduling Google Ads strictly during business decision-maker hours (Mon-Fri, 8 AM - 6 PM).",
     execution: [
-      "Re-optimized Google Business Profile (GBP) categories, services, and local geographical service zones.",
-      "Set up an automated email/SMS sequence to encourage and collect Google reviews from satisfied clients, increasing review velocity.",
-      "Created location-specific landing pages optimized for keywords like 'commercial cleaning Portsmouth' and 'office cleaning services near me'.",
-      "Redesigned the homepage header and booking flow, replacing long forms with an instant, multi-step quote calculator.",
-      "Injected LocalBusiness schema structured data markup to help search engine crawlers map localized details."
+      "Targeted high-intent local B2B keywords: 'commercial cleaning portsmouth', 'office cleaning portsmouth', and 'contract cleaning portsmouth'.",
+      "Configured Google Ads using Exact & Phrase match with bids aligned to a £2-£4 average CPC range.",
+      "Implemented a strict day-parting schedule (Mon-Fri, 8 AM - 6 PM) to ensure ads only run when office/facilities managers are active.",
+      "Redesigned the landing page structure to inject customer testimonials, Cialdini-inspired social proof, and a simplified quick-quote form.",
+      "Set up Google Analytics & Search Console conversion tracking to measure KPIs (CTR target >3%, Landing Page Conversion >5%)."
     ],
     results: [
-      "Ranked in the top 3 Google Map Pack spots for primary local commercial and office cleaning terms.",
-      "Boosted inbound quote inquiries and bookings by 140% within the first 90 days.",
-      "Decreased average cost-per-acquisition (CPA) by eliminating third-party lead purchases."
+      "Created a phased digital marketing roadmap (SEO on-page, local citations, and bi-weekly PPC adjustments).",
+      "Projected 2-3 qualified leads per month within the strict £50 monthly budget.",
+      "Established long-term growth benchmarks of +30% organic traffic within 6 months."
     ]
   }
 ];
@@ -90,7 +90,7 @@ export default function CaseStudies() {
         <div className="mb-20">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Case Studies</h2>
           <p className="text-xl text-white/60 max-w-2xl">
-            Real-world marketing plans, SEO diagnostics, and growth campaigns built for local impact.
+            Real-world marketing proposals, SEO diagnostics, and lead-gen campaigns built for local impact.
           </p>
         </div>
 
@@ -222,7 +222,7 @@ export default function CaseStudies() {
                     {selectedStudy.metricLabel}
                   </div>
                 </div>
-                <div className="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
+                <div className="text-4xl md:text-5xl font-extrabold tracking-tight text-white animate-pulse">
                   {selectedStudy.metricValue}
                 </div>
               </div>
@@ -235,7 +235,7 @@ export default function CaseStudies() {
                     <h4 className="text-lg font-bold uppercase tracking-wider text-white/40 mb-3">
                       The Challenge
                     </h4>
-                    <p className="text-white/70 text-base leading-relaxed">
+                    <p className="text-white/70 text-base leading-relaxed whitespace-pre-line">
                       {selectedStudy.challenge}
                     </p>
                   </div>
@@ -243,7 +243,7 @@ export default function CaseStudies() {
                     <h4 className="text-lg font-bold uppercase tracking-wider text-white/40 mb-3">
                       The Strategy
                     </h4>
-                    <p className="text-white/70 text-base leading-relaxed">
+                    <p className="text-white/70 text-base leading-relaxed whitespace-pre-line">
                       {selectedStudy.strategy}
                     </p>
                   </div>
@@ -267,7 +267,7 @@ export default function CaseStudies() {
 
                   <div>
                     <h4 className="text-lg font-bold uppercase tracking-wider text-white/40 mb-4">
-                      Results & Deliverables
+                      Results & Target Objectives
                     </h4>
                     <ul className="space-y-3">
                       {selectedStudy.results.map((item, i) => (
