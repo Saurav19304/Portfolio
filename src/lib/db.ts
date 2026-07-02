@@ -449,3 +449,38 @@ export async function deleteLinkedInPost(id: number): Promise<boolean> {
   if (list.length === filtered.length) return false;
   return await saveLinkedInPosts(filtered);
 }
+
+// --- DATABASE IMAGE STORAGE HELPERS ---
+export async function saveImageToDb(filename: string, mimeType: string, base64Data: string): Promise<boolean> {
+  const p = getPool();
+  if (!p) return false;
+  
+  try {
+    await ensureDb();
+    const payload = JSON.stringify({ mimeType, data: base64Data });
+    await p.query(
+      "INSERT INTO portfolio_data (key, value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()",
+      [`img-${filename}`, payload]
+    );
+    return true;
+  } catch (error) {
+    console.error(`Failed to save image ${filename} to database:`, error);
+    return false;
+  }
+}
+
+export async function getImageFromDb(filename: string): Promise<{ mimeType: string; data: string } | null> {
+  const p = getPool();
+  if (!p) return null;
+
+  try {
+    await ensureDb();
+    const res = await p.query("SELECT value FROM portfolio_data WHERE key = $1", [`img-${filename}`]);
+    if (res.rows.length > 0) {
+      return JSON.parse(res.rows[0].value) as { mimeType: string; data: string };
+    }
+  } catch (error) {
+    console.error(`Failed to fetch image ${filename} from database:`, error);
+  }
+  return null;
+}

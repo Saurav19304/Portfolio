@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import { saveImageToDb } from "@/lib/db";
 
 // POST /api/upload - Handle file upload for blog post images
 export async function POST(request: Request) {
@@ -22,6 +23,21 @@ export async function POST(request: Request) {
     // Prefix with timestamp to avoid name collisions
     const filename = `${Date.now()}-${cleanFilename}`;
     
+    // If a database URL is present (i.e. production environment like Vercel),
+    // save the file directly to the PostgreSQL database to bypass read-only filesystem limitations.
+    const hasDb = !!(process.env.DATABASE_URL || process.env.POSTGRES_URL);
+    if (hasDb) {
+      const mimeType = file.type || "image/png";
+      const base64Data = buffer.toString("base64");
+      const success = await saveImageToDb(filename, mimeType, base64Data);
+      if (success) {
+        return NextResponse.json({ 
+          url: `/api/images/${filename}` 
+        });
+      }
+    }
+    
+    // Fallback for local development: Save file to public/blog directory
     const uploadDir = path.join(process.cwd(), "public/blog");
     
     // Ensure the destination folder exists
