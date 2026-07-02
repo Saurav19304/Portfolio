@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { getPosts, getPostBySlug, incrementPostViews } from "@/lib/db";
 import { formatDate, getReadTime } from "@/lib/blogUtils";
 
+export const revalidate = 0; // Force dynamic rendering on every request to fetch latest database entries
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
