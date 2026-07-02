@@ -13,7 +13,8 @@ type Block =
   | { id: string; type: "text"; text: string }
   | { id: string; type: "image"; src: string; alt: string }
   | { id: string; type: "quote"; text: string }
-  | { id: string; type: "list"; style: "ordered" | "unordered"; items: string[] };
+  | { id: string; type: "list"; style: "ordered" | "unordered"; items: string[] }
+  | { id: string; type: "code"; text: string; language: string };
 
 export default function AdminDashboard() {
   // Authentication State
@@ -224,6 +225,8 @@ export default function AdminDashboard() {
       newBlock = { id: newId, type: "quote", text: "" };
     } else if (type === "list") {
       newBlock = { id: newId, type: "list", style: "unordered", items: [""] };
+    } else if (type === "code") {
+      newBlock = { id: newId, type: "code", text: "", language: "javascript" };
     } else {
       newBlock = { id: newId, type: "text", text: "" };
     }
@@ -369,6 +372,13 @@ export default function AdminDashboard() {
               .map((item) => `<li>${item}</li>`)
               .join("\n");
             return `<${tag}>\n${itemsHtml}\n</${tag}>`;
+          case "code":
+            // Escape HTML entities to prevent raw code from rendering as actual HTML
+            const escapedText = block.text
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;");
+            return `<pre><code class="language-${block.language || "javascript"}">${escapedText}</code></pre>`;
           default:
             return "";
         }
@@ -427,6 +437,23 @@ export default function AdminDashboard() {
             type: "list",
             style: tagName === "ol" ? "ordered" : "unordered",
             items: items.length > 0 ? items : [""],
+          });
+        } else if (tagName === "pre") {
+          const codeEl = el.querySelector("code");
+          const text = codeEl ? codeEl.textContent : el.textContent;
+          
+          let language = "javascript";
+          const classAttr = codeEl?.getAttribute("class") || el.getAttribute("class") || "";
+          const match = classAttr.match(/language-(\w+)/);
+          if (match) {
+            language = match[1];
+          }
+
+          parsedBlocks.push({
+            id,
+            type: "code",
+            text: text || "",
+            language,
           });
         } else {
           parsedBlocks.push({
@@ -1110,6 +1137,41 @@ export default function AdminDashboard() {
                         </div>
                       )}
 
+                      {/* Code block render */}
+                      {block.type === "code" && (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-[9px] text-blue-300 font-bold uppercase tracking-wider">
+                              Code Block
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <label className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Language:</label>
+                              <select
+                                value={block.language || "javascript"}
+                                onChange={(e) => updateBlock(block.id, { language: e.target.value })}
+                                className="px-3 py-1.5 rounded-lg bg-neutral-900 border border-white/10 text-xs focus:outline-none focus:border-white/20 text-white cursor-pointer"
+                              >
+                                <option value="javascript">JavaScript</option>
+                                <option value="typescript">TypeScript</option>
+                                <option value="html">HTML</option>
+                                <option value="css">CSS</option>
+                                <option value="json">JSON</option>
+                                <option value="bash">Bash / Shell</option>
+                                <option value="python">Python</option>
+                                <option value="sql">SQL</option>
+                              </select>
+                            </div>
+                          </div>
+                          <textarea
+                            rows={6}
+                            placeholder="Paste or write code here..."
+                            value={block.text}
+                            onChange={(e) => updateBlock(block.id, { text: e.target.value })}
+                            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/5 text-xs font-mono focus:outline-none focus:border-white/20 transition-colors text-white placeholder-white/20 resize-y"
+                          />
+                        </div>
+                      )}
+
                       {/* List block render */}
                       {block.type === "list" && (
                         <div className="space-y-3">
@@ -1223,6 +1285,13 @@ export default function AdminDashboard() {
                     className="px-4 py-2 rounded-full text-xs font-semibold bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5"
                   >
                     📋 List
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addBlock("code")}
+                    className="px-4 py-2 rounded-full text-xs font-semibold bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5"
+                  >
+                    💻 Code Block
                   </button>
                 </div>
               </div>
