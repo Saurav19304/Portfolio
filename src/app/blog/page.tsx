@@ -8,8 +8,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
   if (!blogSeo) return {};
 
+  const cleanTitle = blogSeo.title?.replace(/ \| Saurav Vaghela$/, "");
+
   return {
-    title: blogSeo.title,
+    title: cleanTitle,
     description: blogSeo.description,
     keywords: blogSeo.keywords ? blogSeo.keywords.split(",").map(k => k.trim()) : [],
     alternates: {

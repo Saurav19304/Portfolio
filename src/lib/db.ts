@@ -215,12 +215,12 @@ export async function getSeoSettings(): Promise<SeoSettings> {
       ogImage: "/og-image.png"
     },
     blog: {
-      title: "Writings & Insights | Saurav Vaghela",
+      title: "Writings & Insights",
       description: "Data-driven strategies, technical SEO tutorials, keyword research principles, and updates from my digital marketing journey.",
       keywords: "SEO, Content Marketing, WordPress, Next.js, Technical SEO",
       robots: "index, follow",
       canonical: "https://saurav.digital/blog",
-      ogTitle: "Writings & Insights | Saurav Vaghela",
+      ogTitle: "Writings & Insights",
       ogDescription: "Data-driven strategies, technical SEO tutorials, keyword research principles, and updates from my digital marketing journey.",
       ogImage: "/og-image.png"
     },
@@ -291,7 +291,7 @@ export async function savePost(postData: Partial<BlogPost> & { slug: string; tit
       featuredImage: postData.featuredImage || "",
       category: postData.category || "General",
       tags: postData.tags || [],
-      metaTitle: postData.metaTitle || `${postData.title} | Saurav Vaghela`,
+      metaTitle: postData.metaTitle || postData.title,
       metaDescription: postData.metaDescription || postData.excerpt || "",
       focusKeyword: postData.focusKeyword || "",
       author: postData.author || "Saurav Vaghela",

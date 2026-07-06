@@ -24,8 +24,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const post = await getPostBySlug(slug);
   if (!post) return {};
 
+  const rawTitle = post.metaTitle || post.title;
+  const cleanTitle = rawTitle.replace(/ \| Saurav Vaghela$/, "");
+
   return {
-    title: post.metaTitle || `${post.title} | Saurav Vaghela`,
+    title: cleanTitle,
     description: post.metaDescription || post.excerpt,
     alternates: {
       canonical: `https://saurav.digital/blog/${post.slug}`,

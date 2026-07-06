@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://saurav.digital"),
   title: {
     default: "Saurav Vaghela | Digital Marketing & SEO Specialist",
-    template: "%s | Saurav Vaghela",
+    template: "%s",
   },
   description: "Portfolio of Saurav Vaghela, a Digital Marketing and SEO professional specializing in keyword research, technical SEO, and data-driven strategies to improve search rankings and organic traffic.",
   keywords: [

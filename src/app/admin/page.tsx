@@ -142,7 +142,7 @@ export default function AdminDashboard() {
       setSlug(derived);
       
       // Auto-set SEO meta title
-      setMetaTitle(title ? `${title} | Saurav Vaghela` : "");
+      setMetaTitle(title || "");
     }
   }, [title, editingSlug]);
 
@@ -1727,7 +1727,7 @@ export default function AdminDashboard() {
                 </div>
                 <input
                   type="text"
-                  placeholder="Writings & Insights | Saurav Vaghela"
+                  placeholder="Writings & Insights"
                   value={seoSettings.blog.title || ""}
                   onChange={(e) => updateBlogSeo({ title: e.target.value })}
                   className="w-full px-5 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-white/30 transition-colors text-white placeholder-white/20"
@@ -1930,7 +1930,7 @@ export default function AdminDashboard() {
                 <h4 className="text-[19px] text-[#1a0dab] hover:underline cursor-pointer font-medium font-sans mb-1 leading-snug line-clamp-2">
                   {activeSeoTab === "home" 
                     ? (seoSettings.home.title || "Saurav Vaghela | Portfolio")
-                    : (seoSettings.blog.title || "Writings & Insights | Saurav Vaghela")}
+                    : (seoSettings.blog.title || "Writings & Insights")}
                 </h4>
 
                 {/* Meta Description snippet */}
