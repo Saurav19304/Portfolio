@@ -272,51 +272,95 @@ export default function AdminDashboard() {
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
-    const table = doc.querySelector("table");
+    const body = doc.body;
 
-    if (table) {
+    const hasTable = body.querySelector("table");
+    const hasList = body.querySelector("ul, ol");
+
+    if (hasTable || hasList) {
       e.preventDefault();
 
-      const rows = Array.from(table.querySelectorAll("tr"));
-      if (rows.length === 0) return;
+      let formattedText = "";
 
-      let markdownTable = "\n";
-      let maxCols = 0;
+      const traverse = (node: Node) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as HTMLElement;
+          const tagName = el.tagName.toLowerCase();
 
-      rows.forEach(row => {
-        const cells = Array.from(row.querySelectorAll("th, td"));
-        if (cells.length > maxCols) maxCols = cells.length;
-      });
+          if (tagName === "table") {
+            const rows = Array.from(el.querySelectorAll("tr"));
+            if (rows.length > 0) {
+              formattedText += "\n";
+              let maxCols = 0;
+              rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll("th, td"));
+                if (cells.length > maxCols) maxCols = cells.length;
+              });
 
-      rows.forEach((row, rowIdx) => {
-        const cells = Array.from(row.querySelectorAll("th, td"));
-        const cellTexts = cells.map(cell => 
-          cell.textContent?.trim().replace(/\n/g, " ").replace(/\|/g, "\\|") || ""
-        );
-        
-        while (cellTexts.length < maxCols) {
-          cellTexts.push("");
+              rows.forEach((row, rowIdx) => {
+                const cells = Array.from(row.querySelectorAll("th, td"));
+                const cellTexts = cells.map(cell => 
+                  cell.textContent?.trim().replace(/\n/g, " ").replace(/\|/g, "\\|") || ""
+                );
+                while (cellTexts.length < maxCols) cellTexts.push("");
+                formattedText += `| ${cellTexts.join(" | ")} |\n`;
+
+                if (rowIdx === 0) {
+                  const separators = Array(maxCols).fill("---");
+                  formattedText += `| ${separators.join(" | ")} |\n`;
+                }
+              });
+              formattedText += "\n";
+            }
+            return;
+          }
+
+          if (tagName === "ul") {
+            const items = Array.from(el.querySelectorAll("li"));
+            items.forEach(item => {
+              formattedText += `• ${item.textContent?.trim() || ""}\n`;
+            });
+            return;
+          }
+
+          if (tagName === "ol") {
+            const items = Array.from(el.querySelectorAll("li"));
+            items.forEach((item, idx) => {
+              formattedText += `${idx + 1}. ${item.textContent?.trim() || ""}\n`;
+            });
+            return;
+          }
+
+          if (tagName === "p" || tagName === "h1" || tagName === "h2" || tagName === "h3" || tagName === "h4" || tagName === "h5" || tagName === "h6") {
+            formattedText += `${el.textContent?.trim() || ""}\n\n`;
+            return;
+          }
+
+          if (tagName === "br") {
+            formattedText += "\n";
+            return;
+          }
         }
 
-        markdownTable += `| ${cellTexts.join(" | ")} |\n`;
+        const children = Array.from(node.childNodes);
+        children.forEach(child => traverse(child));
+      };
 
-        if (rowIdx === 0) {
-          const separators = Array(maxCols).fill("---");
-          markdownTable += `| ${separators.join(" | ")} |\n`;
-        }
-      });
+      traverse(body);
+
+      const cleanedText = formattedText.trim().replace(/\n{3,}/g, "\n\n");
 
       const textarea = e.currentTarget;
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
       
-      const newText = currentText.substring(0, start) + markdownTable + currentText.substring(end);
+      const newText = currentText.substring(0, start) + cleanedText + currentText.substring(end);
       
       updateBlock(blockId, { text: newText });
 
       setTimeout(() => {
         textarea.focus();
-        const cursorPosition = start + markdownTable.length;
+        const cursorPosition = start + cleanedText.length;
         textarea.setSelectionRange(cursorPosition, cursorPosition);
       }, 0);
     }
