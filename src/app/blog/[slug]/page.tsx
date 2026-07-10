@@ -183,6 +183,30 @@ export default async function BlogPostPage({ params }: PageProps) {
           color: #f8f8f2;
           font-size: 0.9rem;
         }
+        .blog-prose table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 1rem;
+          line-height: 1.5;
+        }
+        .blog-prose th {
+          background-color: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          padding: 12px 16px;
+          font-weight: 600;
+          text-align: left;
+          color: #ffffff;
+        }
+        .blog-prose td {
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 12px 16px;
+          color: rgba(255, 255, 255, 0.8);
+          background-color: rgba(255, 255, 255, 0.01);
+        }
+        .blog-prose tr:nth-child(even) td {
+          background-color: rgba(255, 255, 255, 0.03);
+        }
       `}} />
 
       {/* Background Decorative Glow */}

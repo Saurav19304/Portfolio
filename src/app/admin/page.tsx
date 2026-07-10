@@ -363,6 +363,7 @@ export default function AdminDashboard() {
             const lines = block.text.split("\n");
             let inList = false;
             let listStyle: "unordered" | "ordered" | null = null;
+            let inTable = false;
             let resultHtml = "";
             let currentParagraph = "";
 
@@ -381,15 +382,58 @@ export default function AdminDashboard() {
               }
             };
 
+            const flushTable = () => {
+              if (inTable) {
+                resultHtml += "</tbody>\n</table>\n";
+                inTable = false;
+              }
+            };
+
             for (let i = 0; i < lines.length; i++) {
               const line = lines[i];
               const trimmedLine = line.trim();
               
-              const isUnordered = /^[•\-\*\+]\s+(.*)/.exec(trimmedLine);
-              const isOrdered = /^\d+[\.\)]\s+(.*)/.exec(trimmedLine);
+              const isTabTable = line.includes("\t");
+              const isPipeTable = trimmedLine.startsWith("|") && trimmedLine.endsWith("|");
+              const isTable = isTabTable || isPipeTable;
 
-              if (isUnordered) {
+              const isUnordered = !isTable && /^[•\-\*\+]\s+(.*)/.exec(trimmedLine);
+              const isOrdered = !isTable && /^\d+[\.\)]\s+(.*)/.exec(trimmedLine);
+
+              if (isTable) {
                 flushParagraph();
+                flushList();
+
+                let cells: string[] = [];
+                if (isTabTable) {
+                  cells = line.split("\t").map(cell => cell.trim());
+                } else {
+                  cells = line.split("|").map(cell => cell.trim()).filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+                }
+
+                const isSeparator = cells.length > 0 && cells.every(cell => /^[:\-\s]*$/.test(cell) && cell.includes("-"));
+
+                if (isSeparator) {
+                  continue;
+                }
+
+                if (!inTable) {
+                  resultHtml += "<table>\n<thead>\n<tr>\n";
+                  cells.forEach(cell => {
+                    resultHtml += `  <th>${cell}</th>\n`;
+                  });
+                  resultHtml += "</tr>\n</thead>\n<tbody>\n";
+                  inTable = true;
+                } else {
+                  resultHtml += "<tr>\n";
+                  cells.forEach(cell => {
+                    resultHtml += `  <td>${cell}</td>\n`;
+                  });
+                  resultHtml += "</tr>\n";
+                }
+              } else if (isUnordered) {
+                flushParagraph();
+                flushTable();
                 if (!inList || listStyle !== "unordered") {
                   flushList();
                   resultHtml += "<ul>\n";
@@ -399,6 +443,7 @@ export default function AdminDashboard() {
                 resultHtml += `  <li>${isUnordered[1]}</li>\n`;
               } else if (isOrdered) {
                 flushParagraph();
+                flushTable();
                 if (!inList || listStyle !== "ordered") {
                   flushList();
                   resultHtml += "<ol>\n";
@@ -409,8 +454,10 @@ export default function AdminDashboard() {
               } else if (trimmedLine === "") {
                 flushParagraph();
                 flushList();
+                flushTable();
               } else {
                 flushList();
+                flushTable();
                 if (currentParagraph) {
                   currentParagraph += "<br />" + line;
                 } else {
@@ -421,6 +468,7 @@ export default function AdminDashboard() {
 
             flushParagraph();
             flushList();
+            flushTable();
             return resultHtml.trim();
           }
           case "quote":
