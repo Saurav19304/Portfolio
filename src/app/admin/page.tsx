@@ -262,6 +262,66 @@ export default function AdminDashboard() {
     );
   };
 
+  const handleTextareaPaste = (
+    e: React.ClipboardEvent<HTMLTextAreaElement>,
+    blockId: string,
+    currentText: string
+  ) => {
+    const html = e.clipboardData.getData("text/html");
+    if (!html) return;
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const table = doc.querySelector("table");
+
+    if (table) {
+      e.preventDefault();
+
+      const rows = Array.from(table.querySelectorAll("tr"));
+      if (rows.length === 0) return;
+
+      let markdownTable = "\n";
+      let maxCols = 0;
+
+      rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll("th, td"));
+        if (cells.length > maxCols) maxCols = cells.length;
+      });
+
+      rows.forEach((row, rowIdx) => {
+        const cells = Array.from(row.querySelectorAll("th, td"));
+        const cellTexts = cells.map(cell => 
+          cell.textContent?.trim().replace(/\n/g, " ").replace(/\|/g, "\\|") || ""
+        );
+        
+        while (cellTexts.length < maxCols) {
+          cellTexts.push("");
+        }
+
+        markdownTable += `| ${cellTexts.join(" | ")} |\n`;
+
+        if (rowIdx === 0) {
+          const separators = Array(maxCols).fill("---");
+          markdownTable += `| ${separators.join(" | ")} |\n`;
+        }
+      });
+
+      const textarea = e.currentTarget;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      
+      const newText = currentText.substring(0, start) + markdownTable + currentText.substring(end);
+      
+      updateBlock(blockId, { text: newText });
+
+      setTimeout(() => {
+        textarea.focus();
+        const cursorPosition = start + markdownTable.length;
+        textarea.setSelectionRange(cursorPosition, cursorPosition);
+      }, 0);
+    }
+  };
+
   // List Item Helpers
   const addListItem = (blockId: string, itemIndex: number) => {
     setBlocks(
@@ -1160,6 +1220,7 @@ export default function AdminDashboard() {
                             placeholder="Start typing your paragraph content here..."
                             value={block.text}
                             onChange={(e) => updateBlock(block.id, { text: e.target.value })}
+                            onPaste={(e) => handleTextareaPaste(e, block.id, block.text)}
                             className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/5 text-sm leading-relaxed focus:outline-none focus:border-white/20 transition-colors text-white placeholder-white/20 resize-y"
                           />
                         </div>
