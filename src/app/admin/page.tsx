@@ -359,9 +359,70 @@ export default function AdminDashboard() {
         switch (block.type) {
           case "heading":
             return `<h${block.level}>${block.text}</h${block.level}>`;
-          case "text":
-            // Replace newlines with <br /> or wrap in paragraphs
-            return `<p>${block.text.replace(/\n/g, "<br />")}</p>`;
+          case "text": {
+            const lines = block.text.split("\n");
+            let inList = false;
+            let listStyle: "unordered" | "ordered" | null = null;
+            let resultHtml = "";
+            let currentParagraph = "";
+
+            const flushParagraph = () => {
+              if (currentParagraph) {
+                resultHtml += `<p>${currentParagraph}</p>\n`;
+                currentParagraph = "";
+              }
+            };
+
+            const flushList = () => {
+              if (inList) {
+                resultHtml += `</${listStyle === "ordered" ? "ol" : "ul"}>\n`;
+                inList = false;
+                listStyle = null;
+              }
+            };
+
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              const trimmedLine = line.trim();
+              
+              const isUnordered = /^[•\-\*\+]\s+(.*)/.exec(trimmedLine);
+              const isOrdered = /^\d+[\.\)]\s+(.*)/.exec(trimmedLine);
+
+              if (isUnordered) {
+                flushParagraph();
+                if (!inList || listStyle !== "unordered") {
+                  flushList();
+                  resultHtml += "<ul>\n";
+                  inList = true;
+                  listStyle = "unordered";
+                }
+                resultHtml += `  <li>${isUnordered[1]}</li>\n`;
+              } else if (isOrdered) {
+                flushParagraph();
+                if (!inList || listStyle !== "ordered") {
+                  flushList();
+                  resultHtml += "<ol>\n";
+                  inList = true;
+                  listStyle = "ordered";
+                }
+                resultHtml += `  <li>${isOrdered[1]}</li>\n`;
+              } else if (trimmedLine === "") {
+                flushParagraph();
+                flushList();
+              } else {
+                flushList();
+                if (currentParagraph) {
+                  currentParagraph += "<br />" + line;
+                } else {
+                  currentParagraph = line;
+                }
+              }
+            }
+
+            flushParagraph();
+            flushList();
+            return resultHtml.trim();
+          }
           case "quote":
             return `<blockquote>${block.text}</blockquote>`;
           case "image":
